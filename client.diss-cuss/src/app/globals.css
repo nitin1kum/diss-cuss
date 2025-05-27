@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #f0faff;
+  --card-bg: #ffffff;
+  --text-primary: #0a1f33;
+  --text-secondary: #5b7083;
+  --accent: #38bdf8;
+  --border: #dbeafe;
+  --border-secondary: #c2c2c3;
+  --highlight: #7dd3fc;
+  --link: #0284c7;
+}
+
+.dark {
+  --bg: #0e1a24;
+  --card-bg: #16222f;
+  --text-primary: #e6f7ff;
+  --text-secondary: #94a3b8;
+  --accent: #38bdf8;
+  --border: #1e293b;
+  --border-secondary: #4e5d76;
+  --highlight: #38bdf8;
+  --link: #0ea5e9;
+}
+
+.tiptap {
+  outline: none !important;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+@layer components {
+  /* target ProseMirror’s wrapper */
+  .ProseMirror {
+    /* restore default list styling */
+  }
+  .ProseMirror ul {
+    @apply list-disc list-inside pl-5;
+  }
+  .ProseMirror ol {
+    @apply list-decimal list-inside pl-5;
+  }
+}
+
+.text-editor img {
+  width: 200px !important;
+  object-fit: contain;
+}
+
+.text-editor code {
+  background: #1e1e1e;
+  display: block;
+  border-radius: 5px;
+  padding: 1px;
+}
+
+@keyframes animate-fade-in {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+.ql-toolbar {
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-color: var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
+  border-radius: 6px 6px 0px 0px !important;
+}
+
+.ql-snow .ql-stroke {
+  stroke: var(--text-primary) !important;
+}
+
+.ql-snow svg:hover .ql-stroke {
+  stroke: var(--accent) !important;
+}
+
+button.ql-active .ql-stroke {
+  stroke: var(--accent) !important;
+}
+
+.ql-fill {
+  fill: var(--text-primary) !important;
+}
+.ql-active .ql-fill {
+  fill: var(--accent) !important;
+}
+
+.ql-picker-options {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+.ql-picker-label {
+  color: var(--text-primary) !important;
+  border: none !important;
+}
+
+.ql-container {
+  border: transparent !important;
+  height: 80px !important;
+}
+
+.ql-editor {
+  color: var(--text-primary) !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--text-secondary) !important;
+  opacity: 1;
+}

@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id         String   @unique @default(uuid())
+  username   String   @default("anonyms")
+  email      String   @unique
+  image      String   @default("/default_user.png")
+  threads    Thread[]
+  password   String?
+  isVerified Boolean  @default(false)
+  role       Role     @default(USER)
+  likes      Like[]
+}
+
+model Discussion {
+  id         String   @unique @default(uuid())
+  name       String
+  imdb_id    String   @unique
+  threads    Thread[]
+}
+
+model Thread {
+  id            String     @id @default(uuid())
+  discussion    Discussion @relation(fields: [discussion_id], references: [id])
+  discussion_id String
+  user          User       @relation(fields: [user_id], references: [id])
+  user_id       String
+  content       String
+  likes         Like[]
+  isReply       Boolean    @default(false)
+  parent        Thread?    @relation("CommentReplies", fields: [parent_id], references: [id])
+  parent_id     String?
+  replies       Thread[]   @relation("CommentReplies")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt()
+}
+
+model Like {
+  user_id  String
+  thread_id String
+  liked     Boolean
+
+  user User @relation(fields: [user_id], references: [id])
+  item Thread @relation(fields: [thread_id], references: [id])
+
+  @@id([user_id, thread_id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
