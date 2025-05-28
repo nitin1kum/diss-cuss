@@ -43,6 +43,9 @@ export const metadata:Metadata = {
     description: "Join the conversation on your favorite movies. Create threads and connect with others.",
     images: [`${process.env.NEXTBASE_URL}/logo.png`],
   },
+  other: {
+    'google-site-verification': 'uoc6VZeA622AXSIYu3R4Zo6_1GCY7WuDu4a5SuMZPBU'
+  }
 };
 
 export default function RootLayout({
