@@ -36,9 +36,10 @@ export async function POST(req: NextRequest) {
     }
 
     const fullBody = Buffer.concat(chunks);
-    const { content, discussion_id } = JSON.parse(fullBody.toString()) as {
+    const { content,html, discussion_id } = JSON.parse(fullBody.toString()) as {
       content: string;
       discussion_id: string;
+      html : string;
     };
 
     const thread = await prisma.thread.create({
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
         discussion_id,
         user_id: session.user.id,
         content,
+        html
       },
       include: {
         replies: {

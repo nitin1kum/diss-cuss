@@ -8,6 +8,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("t");
     const id = searchParams.get("id");
+    if(!type || !id){
+      throw new Error("Query not defined.")
+    }
 
     const res = await fetch(
       `${process.env.TMDB_BASE_URL}/${type}/${id}`,
@@ -46,6 +49,8 @@ export async function GET(req: NextRequest) {
         data: {
           imdb_id: `${mediaInfo.id}`,
           name,
+          type : type || "movie",
+          poster : mediaInfo.poster_path || "/default_poster.jpg"
         },
         select: {
           id: true,

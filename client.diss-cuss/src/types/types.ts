@@ -216,6 +216,7 @@ export type DiscussionThreadResponse = {
     discussion_id: string;
     user_id: string;
     content: string;
+    html : string;
     isReply: boolean;
     parent_id: string | null;
     createdAt: Date;
@@ -246,6 +247,7 @@ export type ThreadProps = ({
     discussion_id: string;
     user_id: string;
     content: string;
+    html : string;
     isReply: boolean;
     parent_id: string | null;
     createdAt: Date;

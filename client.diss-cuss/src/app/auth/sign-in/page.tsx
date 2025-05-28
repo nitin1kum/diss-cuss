@@ -5,12 +5,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Loader } from "lucide-react";
+import { Eye, EyeClosed, Loader } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading,setLoading] = useState(false);
+  const [showPassword,setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -33,6 +35,7 @@ export default function SignInPage() {
       if (res?.error) {
         setError(res.error);
       } else {
+        toast.success("Login successfully")
         router.push("/");
       }
     } catch (error) {
@@ -44,7 +47,7 @@ export default function SignInPage() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "http://localhost:3000" });
+    signIn("google");
   };
 
   return (
@@ -64,8 +67,8 @@ export default function SignInPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-card border shadow-lg border-border backdrop-blur-xl py-8 px-6 rounded-lg sm:px-10">
           {error && (
-            <div className="mb-4 text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded">
-              {error}
+            <div className="mb-4 text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded" dangerouslySetInnerHTML={{__html : error}}>
+              {/* {error} */}
             </div>
           )}
 
@@ -109,16 +112,20 @@ export default function SignInPage() {
               <label htmlFor="password" className="block text-sm font-medium mb-2 text-subtext">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none block w-full px-3 text-text py-2 border border-border-secondary rounded-md shadow-sm ouline-none placeholder-text/20 focus:outline-none tracking-wide"
-              />
+              <div className="relative flex items-center">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  placeholder="*******"
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 text-text py-2 border border-border-secondary rounded-md shadow-sm ouline-none placeholder-text/20 focus:outline-none tracking-wide"
+                />
+                <button type="button" className="absolute right-5 text-text" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <Eye className="size-5"/> : <EyeClosed className="size-5"/>}</button>
+              </div>
             </div>
 
             <div>

@@ -1,5 +1,4 @@
-// src/lib/prisma.ts
-import { PrismaClient } from '@prisma/client'; // Adjust if output is different
+import { PrismaClient } from '@prisma/client';
 
 // Avoid creating a new client every time in development
 const globalForPrisma = globalThis as unknown as {

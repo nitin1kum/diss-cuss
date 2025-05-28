@@ -18,10 +18,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Diss-Cuss",
-  description:
-    "Discuss about any movie, webseries, serial, drama etc with the world.",
+export const metadata:Metadata = {
+  title: "Diss-Cuss | Movie Discussions & Threads",
+  description: "Join Diss-Cuss to explore, discuss, and create threads about your favorite movies. Stay updated and connect with fellow film lovers.",
+  keywords: ["movies", "movie discussions", "movie threads", "film community", "Diss-Cuss"],
+  openGraph: {
+    title: "Diss-Cuss | Talk About Movies",
+    description: "Create threads, discuss movies, and join a community of film lovers.",
+    url: "${process.env.NEXTBASE_URL}",
+    siteName: "Diss-Cuss",
+    images: [
+      {
+        url: `${process.env.NEXTBASE_URL}/logo.png`,
+        width: 1200,
+        height: 630,
+        alt: "Diss-Cuss - Talk About Movies",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Diss-Cuss | Talk About Movies",
+    description: "Join the conversation on your favorite movies. Create threads and connect with others.",
+    images: [`${process.env.NEXTBASE_URL}/logo.png`],
+  },
 };
 
 export default function RootLayout({

@@ -1,8 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { sendEmail } from "@/action/emailSender";
+import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 const emailTemplate = `<!DOCTYPE html>
@@ -87,83 +84,27 @@ const emailTemplate = `<!DOCTYPE html>
 </html>
 `;
 
-const schema = z.object({
-  username: z
-    .string()
-    .min(3, { message: "Username should have length more than 3" }),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-// wip update error handling
-
-export async function POST(req: NextRequest) {
+export async function POST(req : NextRequest) {
   try {
-    const { username, email, password } = schema.parse(await req.json());
+    const {email} = await req.json();
 
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
-
-    if (user) {
-      return NextResponse.json(
-        { message: "Email already registered" },
-        { status: 400 }
-      );
+    const token = await jwt.sign(
+          { email },
+          process.env.JWT_SECRET!,
+          { algorithm: "HS256", expiresIn: "1h" }
+        );
+        const html = emailTemplate.replace(
+          "{{VERIFY_URL}}",
+          `${process.env.NEXTBASE_URL}/api/auth/verify/${token}`
+        );
+    const info = await sendEmail(email,"Email Verification",html);
+    
+    return NextResponse.json({message : "Verificatio link send"});
+  } catch (error : any) {
+    console.log("Error sending verification - ",error)
+    if(error.message){
+      throw new Error(error.message)
     }
-
-    const hashedPwd = await bcrypt.hash(password, 16);
-
-    const newUser = await prisma.user.create({
-      data: {
-        username,
-        email,
-        password: hashedPwd,
-      },
-    });
-
-    const token = jwt.sign(
-      { email: newUser.email },
-      process.env.JWT_SECRET!,
-      { algorithm: "HS256", expiresIn: "1h" }
-    );
-    const html = emailTemplate.replace(
-      "{{VERIFY_URL}}",
-      `${process.env.NEXTBASE_URL}/api/auth/verify/${token}`
-    );
-
-    if (newUser) {
-      await sendEmail(newUser.email, "Email Verification", html);
-      return NextResponse.json(
-        { message: "User created successfully" },
-        { status: 201 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "Oops! Some unknown error occurred" },
-      { status: 400 }
-    );
-  } catch (error) {
-    console.log("error while signing up - ", error);
-    // Zod validation error
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          message: "Validation failed",
-          errors: error.errors.map((e) => ({
-            field: e.path[0],
-            message: e.message,
-          })),
-        },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({message : "Internal server error"},{status : 500});
   }
 }

@@ -81,6 +81,7 @@ export default function Discussion({
   const handleSubmit = async (editor: RefObject<any>) => {
     if (!editor?.current) return;
     const html = editor.current.getEditor().getSemanticHTML();
+    const content = editor.current.getEditor().getText();
     const textLength = editor.current.getEditor().getText().trim().length;
     if (textLength < 3) {
       toast.warn("Please write at least 3 characters");
@@ -92,7 +93,7 @@ export default function Discussion({
       const res = await fetch(`/api/collection/post/thread`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: html, discussion_id }),
+        body: JSON.stringify({ content,html, discussion_id }),
       });
       if (!res.ok) throw new Error("Failed to post");
       const { data: newThread } = await res.json();
@@ -125,8 +126,8 @@ export default function Discussion({
   return (
     <div key={discussion_id}>
       <h2 className="pt-16 text-text font-medium tracking-wide">
-        
-        Discussion{totalDiscussion > 0 && 's'} ({totalDiscussion})</h2>
+        Discussion{totalDiscussion > 0 && "s"} ({totalDiscussion})
+      </h2>
 
       <div className="flex gap-2 mb-10 items-center justify-between">
         <h3 className="text-text m-0 font-medium tracking-wide">{name}</h3>
@@ -158,7 +159,8 @@ export default function Discussion({
           dataLength={threads.length}
           next={fetchMoreData}
           hasMore={!isReachingEnd}
-          loader={<ThreadSkelton key="infinite-scroll"/>}
+          style={{overflowY : "hidden"}}
+          loader={<ThreadSkelton key="infinite-scroll" />}
         >
           {threads.map((thread: ThreadProps, idx: number) => (
             <Thread
@@ -166,6 +168,8 @@ export default function Discussion({
               thread={thread}
               isLast={idx === threads.length - 1}
               level={1}
+              hideParent={() => {return true}}
+            
             />
           ))}
         </InfiniteScroll>

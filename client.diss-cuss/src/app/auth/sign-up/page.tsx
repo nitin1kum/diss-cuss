@@ -5,18 +5,18 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
-import { Loader } from "lucide-react";
+import { Eye, EyeClosed, Loader } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword,setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   // wip add schema validation
-  // wip add password show button/
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,24 +35,14 @@ export default function SignUpPage() {
       });
 
       if (res.ok) {
-        // auto sign in after successful signup
-        const signInRes = await signIn("login", {
-          redirect: false,
-          email,
-          password,
-        });
-        if (!signInRes?.error) {
-          router.push("/");
-        } else {
-          router.push("/auth/sign-in");
-        }
+        return router.push("/auth/verify/validation");
       } else {
         const data = await res.json();
         setError(data.message || "Failed to sign up");
       }
-    } catch (error) {
+    } catch (error  :any) {
       console.log("Error while signing up ", error);
-      setError("Some error occurred.")
+      setError(error.message || "Some error occurred.");
     } finally {
       setLoading(false);
     }
@@ -150,16 +140,20 @@ export default function SignUpPage() {
               >
                 Password <span className="text-red-400">*</span>
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none block w-full px-3 text-text py-2 border border-border-secondary rounded-md shadow-sm ouline-none placeholder-text/20 focus:outline-none tracking-wide"
-              />
+              <div className="relative flex items-center">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  placeholder="*******"
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 text-text py-2 border border-border-secondary rounded-md shadow-sm ouline-none placeholder-text/20 focus:outline-none tracking-wide"
+                />
+                <button type="button" className="absolute right-5 text-text" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <Eye className="size-5"/> : <EyeClosed className="size-5"/>}</button>
+              </div>
             </div>
 
             <div>

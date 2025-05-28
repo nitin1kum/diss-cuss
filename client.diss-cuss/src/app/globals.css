@@ -7,6 +7,11 @@
   margin: 0;
   padding: 0;
 }
+body{
+  width: 100vw;
+  overflow-x: hidden;
+  height: fit-content;
+}
 
 :root {
   --bg: #f0faff;

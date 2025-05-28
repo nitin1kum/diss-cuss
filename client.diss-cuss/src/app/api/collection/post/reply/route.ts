@@ -36,11 +36,12 @@ export async function POST(req: NextRequest) {
     }
 
     const fullBody = Buffer.concat(chunks);
-    const { content, thread_id, discussion_id } = JSON.parse(
+    const { content, html, thread_id, discussion_id } = JSON.parse(
       fullBody.toString()
     ) as {
       content: string;
       thread_id: string;
+      html: string;
       discussion_id: string;
     };
 
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
         discussion_id,
         user_id: session.user.id,
         content,
+        html,
         isReply: true,
         parent_id: thread_id,
       },
@@ -73,14 +75,14 @@ export async function POST(req: NextRequest) {
             },
           },
         },
-        likes : {
-          where : {
-            user_id : session.user.id
+        likes: {
+          where: {
+            user_id: session.user.id,
           },
-          select : {
-            liked : true
-          }
-        }
+          select: {
+            liked: true,
+          },
+        },
       },
     });
 

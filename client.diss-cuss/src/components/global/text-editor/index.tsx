@@ -41,17 +41,17 @@ const RichTextEditor: React.FC<Props> = ({
   const { data } = useSession();
   const [savedRange, setSavedRange] = useState<ReactQuill.Range | null>(null);
   const quillRef = useRef<ReactQuill | null>(null);
-const modules = {
-  toolbar: {
-    container: `#${"editor" + id}`,
-  }
-};
+  const modules = {
+    toolbar: {
+      container: `#${"editor" + id}`,
+    },
+  };
 
-const onSelectionChange = (range :any, oldRange :any, source:any) => {
-  if (range) {
-    setSavedRange(range);
-  }
-};
+  const onSelectionChange = (range: any, oldRange: any, source: any) => {
+    if (range) {
+      setSavedRange(range);
+    }
+  };
   const handleCloseClick = () => {
     if (quillRef && quillRef.current) {
       quillRef.current.getEditor().setText("");
@@ -60,7 +60,7 @@ const onSelectionChange = (range :any, oldRange :any, source:any) => {
   };
 
   return (
-    <div className="text-editor border w-full min-w-80 sm:max-w-3xl border-border-secondary rounded-xl space-y-2 my-3">
+    <div className="text-editor border w-full min-w-72 sm:max-w-3xl border-border-secondary rounded-xl space-y-2 my-3">
       {!data ? (
         <div className="flex text-text items-center gap-3 justify-center py-10">
           Sign in to comment

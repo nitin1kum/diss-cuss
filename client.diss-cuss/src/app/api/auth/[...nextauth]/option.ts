@@ -10,9 +10,13 @@ export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       id: "credentials",
-      name : 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "123xyz@gmail.com" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "123xyz@gmail.com",
+        },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any) {
@@ -20,24 +24,33 @@ export const authOptions: NextAuthOptions = {
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
           });
-
           if (!user) {
             throw new Error("No user found with this email");
           }
 
           if (!user.password) {
-            throw new Error("This account uses Google login. Try signing in with Google.");
+            throw new Error(
+              "This account uses Google login. Try signing in with Google."
+            );
           }
 
-          // if (!user.isVerified) {
-          //   throw new Error("Please verify your account before login");
-          // }
+          if (!user.emailVerified) {
+            throw new Error(
+              `Please verify your account before login. <a href="/auth/verify/generate">Verify</a>`
+            );
+          }
 
-          const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
+          const isPasswordCorrect = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
           if (!isPasswordCorrect) throw new Error("Incorrect password");
 
           return user;
-        } catch (error) {
+        } catch (error: any) {
+          if (error.message) {
+            throw new Error(error.message);
+          }
           throw new Error("Authentication failed");
         }
       },
@@ -49,22 +62,22 @@ export const authOptions: NextAuthOptions = {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
+          response_type: "code",
+        },
       },
       profile(profile) {
         return {
           id: profile.sub,
           username: profile.name,
           email: profile.email,
-          isVerified: profile.email_verified,
+          emailVerified: profile.email_verified,
           image: profile.picture,
         };
       },
     }),
   ],
-  pages : {
-    signIn : '/auth/sign-in'
+  pages: {
+    signIn: "/auth/sign-in",
   },
   session: {
     strategy: "jwt",
@@ -73,9 +86,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
+        token.id = dbUser?.id || user.id;
         token.username = user.username;
-        token.isVerified = user.isVerified;
+        token.emailVerified = user.emailVerified;
       }
       return token;
     },
@@ -85,11 +101,10 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.id,
           username: token.username,
-          isVerified: token.isVerified,
+          emailVerified: token.emailVerified,
         };
       }
       return session;
     },
   },
-  debug : true
 };
