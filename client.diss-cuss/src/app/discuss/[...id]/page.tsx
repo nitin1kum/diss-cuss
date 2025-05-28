@@ -12,11 +12,11 @@ import { generateKeywords } from "@/utils/utilities";
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string[] };
+  params: Promise<any>;
 }) {
   try {
     // Fetch the discussion with its top thread (most likes)
-    const discussionId = params.id[1];
+    const discussionId =(await params).id[1];
     const discussion = await prisma.discussion.findUnique({
       where: { imdb_id: discussionId },
       select: {
@@ -146,7 +146,7 @@ const generateJsonLD = async (discussion_id : string) => {
   return jsonLd;
 };
 
-const Discuss = async ({ params }: { params: { id: string[] } }) => {
+const Discuss = async ({ params }: { params: Promise<any> }) => {
   const { id } = await params;
   if (!id || id.length < 2) redirect("/");
 

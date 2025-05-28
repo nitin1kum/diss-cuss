@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from 'jsonwebtoken'
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req : NextRequest,{params} : {params : {token : string}}) {
+export async function GET(req : NextRequest,{params} : {params : Promise<any>}) {
   try {
     const {token} = await params;
     const verify = jwt.verify(token,process.env.JWT_SECRET!) as {email : string};

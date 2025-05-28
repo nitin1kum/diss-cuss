@@ -1,8 +1,8 @@
+export const dynamic = 'force-dynamic';
 import List from "@/components/global/list";
 import React, { Suspense } from "react";
 import HomeSkelton from "./_components/HomeSkelton";
 import { toast } from "react-toastify";
-import Head from "next/head";
 
 
 const Home = async () => {
