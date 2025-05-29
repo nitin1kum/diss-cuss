@@ -20,24 +20,22 @@ type Sitemap = Array<{
   images? : string[]
 }>
 
-export async function generateSitemaps() {
-  const discussions = await prisma.discussion.count();
-  const length = (discussions + 44999)/45000;
-  const sitemaps : {id : number}[] = [];
-  Array([{length}]).map((_,id) => {
-    sitemaps.push({id})
-  })
-  return sitemaps;
-}
+// export async function generateSitemaps() {
+//   const discussions = await prisma.discussion.count();
+//   const length = (discussions + 44999)/45000;
+//   const sitemaps : {id : number}[] = [];
+//   Array([{length}]).map((_,id) => {
+//     sitemaps.push({id})
+//   })
+//   return sitemaps;
+// }
 
-export default async function sitemap({id} : {id : number}): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXTBASE_URL || "https://diss-cuss.vercel.appp";
   
     // Fetch all discussion slugs (imdb_ids)
     const discussions = await prisma.discussion.findMany({
       select: { imdb_id: true,type : true,poster: true },
-      skip : id*45000,
-      take : 45000
     });
   
     const routes : Sitemap = [] ;
