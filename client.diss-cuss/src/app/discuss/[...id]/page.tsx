@@ -55,7 +55,7 @@ export async function generateMetadata({
           {
             url:
               discussion.name ||
-              `${process.env.NEXTBASE_URL}/default_poster.jpg`,
+              `${process.env.NEXTBASE_URL}/default_poster.png`,
             width: 1200,
             height: 630,
             alt: discussion.name,
@@ -68,7 +68,7 @@ export async function generateMetadata({
         title: `${discussion.name} Discussion – Diss-Cuss`,
         description: mainSnippet,
         images: [
-          discussion.poster || `${process.env.NEXTBASE_URL}/default_poster.jpg`,
+          discussion.poster || `${process.env.NEXTBASE_URL}/default_poster.png`,
         ],
       },
       // This will need manual injection in your <head> if Next.js metadata API doesn’t support jsonLd directly:
