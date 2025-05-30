@@ -37,9 +37,6 @@ export const metadata:Metadata = {
     ],
     type: "website",
   },
-  icons : {
-    icon : `${process.env.NEXTBASE_URL}/logo.png`
-  },
   twitter: {
     card: "summary_large_image",
     title: "Diss-Cuss | Talk About Movies",
