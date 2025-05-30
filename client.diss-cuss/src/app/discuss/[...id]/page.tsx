@@ -3,11 +3,11 @@ import MovieHero from "../_components/MovieHeader";
 import { redirect } from "next/navigation";
 import Discussion from "../_components/Discusson";
 import { DetailsResponse } from "@/types/types";
-import DiscussSkeleton from "../_components/MovieHeaderSkelton";
 import { toast } from "react-toastify";
 import { prisma } from "@/lib/prisma";
 import Head from "next/head";
 import { generateKeywords } from "@/utils/utilities";
+import { DiscussSkeleton } from "../_components/MovieHeaderSkelton";
 
 export async function generateMetadata({
   params,
@@ -17,6 +17,8 @@ export async function generateMetadata({
   try {
     // Fetch the discussion with its top thread (most likes)
     const discussionId =(await params).id[1];
+    if(!discussionId) return null;
+
     const discussion = await prisma.discussion.findUnique({
       where: { imdb_id: discussionId },
       select: {
@@ -76,7 +78,6 @@ export async function generateMetadata({
       alternates: {},
     };
   } catch(error) {
-    console.log(error)
     return {
       title: "Discussion – Diss-Cuss",
       description: "Join the conversation about movie",
@@ -152,7 +153,8 @@ const Discuss = async ({ params }: { params: Promise<any> }) => {
 
   const res = await fetch(
     `${process.env.NEXTBASE_URL}/api/collection/details?t=${id[0]}&id=${id[1]}`
-  );
+  ,{cache : "force-cache"});
+
   if (!res.ok) {
     toast.error("Oops! Some error occurred");
     return <DiscussSkeleton />;

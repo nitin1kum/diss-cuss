@@ -1,8 +1,7 @@
 "use client";
-import React, { RefObject, useState } from "react";
-import { Plus } from "lucide-react";
+import React, { RefObject, useEffect, useState } from "react";
+import { Loader, Plus } from "lucide-react";
 import useSWRInfinite from "swr/infinite";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { toast } from "react-toastify";
 
 import RichTextEditor from "@/components/global/text-editor";
@@ -10,7 +9,8 @@ import Thread from "@/components/global/thread";
 import ThreadsSkelton from "./ThreadsSkelton";
 import { fetcher } from "@/utils/fetcher";
 import { DiscussionThreadResponse, ThreadProps } from "@/types/types";
-import ThreadSkelton from "@/components/global/thread/ThreadSkelton";
+import { useLoader } from "@/contexts/LoaderStateProvider";
+import UpdateLoader from "@/components/global/update-loader";
 
 const PAGE_LIMIT = 6;
 
@@ -23,6 +23,7 @@ export default function Discussion({
 }) {
   const [showEditor, setShowEditor] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const context = useLoader();
 
   // 1) SWR Infinite key function
   const getKey = (
@@ -44,6 +45,8 @@ export default function Discussion({
     size,
     setSize,
     mutate,
+    isValidating,
+    isLoading,
   } = useSWRInfinite<DiscussionThreadResponse>(
     (pageIndex: number, previousPageData: DiscussionThreadResponse | null) => {
       if (!discussion_id) return null;
@@ -70,13 +73,6 @@ export default function Discussion({
     return <ThreadsSkelton />;
   }
 
-  // 4) load more
-  const fetchMoreData = () => {
-    if (!isReachingEnd) {
-      setSize(size + 1);
-    }
-  };
-
   // 5) posting a new thread
   const handleSubmit = async (editor: RefObject<any>) => {
     if (!editor?.current) return;
@@ -93,7 +89,7 @@ export default function Discussion({
       const res = await fetch(`/api/collection/post/thread`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content,html, discussion_id }),
+        body: JSON.stringify({ content, html, discussion_id }),
       });
       if (!res.ok) throw new Error("Failed to post");
       const { data: newThread } = await res.json();
@@ -125,6 +121,7 @@ export default function Discussion({
 
   return (
     <div key={discussion_id}>
+      <UpdateLoader isLoading={isLoading}/>
       <h2 className="pt-16 text-text font-medium tracking-wide">
         Discussion{totalDiscussion > 0 && "s"} ({totalDiscussion})
       </h2>
@@ -155,24 +152,34 @@ export default function Discussion({
           No discussion on {name}
         </div>
       ) : (
-        <InfiniteScroll
-          dataLength={threads.length}
-          next={fetchMoreData}
-          hasMore={!isReachingEnd}
-          style={{overflowY : "hidden"}}
-          loader={<ThreadSkelton key="infinite-scroll" />}
-        >
+        <>
           {threads.map((thread: ThreadProps, idx: number) => (
             <Thread
               key={thread.id}
               thread={thread}
               isLast={idx === threads.length - 1}
               level={1}
-              hideParent={() => {return true}}
-            
+              hideParent={() => {
+                return true;
+              }}
             />
           ))}
-        </InfiniteScroll>
+          {!isReachingEnd && (
+            <div className="flex justify-center mt-4">
+              <button
+                className="px-2 py-2 rounded-md bg-accent text-text"
+                onClick={() => setSize(size + 1)}
+                disabled={isValidating || isLoading}
+              >
+                {isValidating ? (
+                  <Loader className="animate-spin size-5" />
+                ) : (
+                  "Load more"
+                )}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

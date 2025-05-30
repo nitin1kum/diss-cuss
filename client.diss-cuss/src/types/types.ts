@@ -36,6 +36,13 @@ type TvSearchResult = {
 
 export type TmdbSearchResult = TmdbMovieResult | TvSearchResult;
 
+export type SearchResponse = {
+  results: TmdbSearchResult[];
+  total_pages: number;
+  total_results: number;
+  page: number;
+};
+
 type TmdbMovieDetails = {
   adult: boolean;
   backdrop_path: string | null;
@@ -206,17 +213,17 @@ export type DiscussionThreadResponse = {
       id: string;
     }[];
     _count: {
-        likes: number;
+      likes: number;
     };
     likes: {
-        liked: boolean;
+      liked: boolean;
     }[];
   } & {
     id: string;
     discussion_id: string;
     user_id: string;
     content: string;
-    html : string;
+    html: string;
     isReply: boolean;
     parent_id: string | null;
     createdAt: Date;
@@ -228,31 +235,31 @@ export type DiscussionThreadResponse = {
   message: string;
 };
 
-export type ThreadProps = ({
-    user: {
-        username: string;
-        image: string;
-    };
-    replies: {
-        id: string;
-    }[];
-    _count: {
-        likes: number;
-    };
-    likes: {
-        liked: boolean;
-    }[];
-} & {
+export type ThreadProps = {
+  user: {
+    username: string;
+    image: string;
+  };
+  replies: {
     id: string;
-    discussion_id: string;
-    user_id: string;
-    content: string;
-    html : string;
-    isReply: boolean;
-    parent_id: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-})
+  }[];
+  _count: {
+    likes: number;
+  };
+  likes: {
+    liked: boolean;
+  }[];
+} & {
+  id: string;
+  discussion_id: string;
+  user_id: string;
+  content: string;
+  html: string;
+  isReply: boolean;
+  parent_id: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 // Final response type
 export type ThreadResponse = {

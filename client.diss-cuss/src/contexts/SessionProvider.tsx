@@ -9,7 +9,7 @@ export default function AuthProvider({
   children
 } : Props) {
   return (
-    <SessionProvider refetchInterval={5*60}>
+    <SessionProvider>
       {children}
     </SessionProvider>
   )

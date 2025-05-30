@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import List from "@/components/global/list";
 import React, { Suspense } from "react";
 import HomeSkelton from "./_components/HomeSkelton";
 import { toast } from "react-toastify";
-
+import UpdateLoader from "@/components/global/update-loader";
 
 const Home = async () => {
   const moviePromise = fetch(
@@ -27,13 +27,15 @@ const Home = async () => {
   // Parse JSON
   const movieData = await movieRes.json();
   const tvShowData = await tvShowRes.json();
-
   return (
     <div className="">
       <Suspense fallback={<HomeSkelton />}>
-        <h2 className="pt-4 text-center w-full text-text">Diss-Cuss</h2>
-        <List heading="popular movies" data={movieData} />
-        <List heading="popular web series / TV" data={tvShowData} />
+        <UpdateLoader />
+        <h2 className="pt-4 text-center text-4xl w-full text-text">
+          Diss-Cuss
+        </h2>
+        <List heading="popular movies" data={movieData.data} />
+        <List heading="popular web series / TV" data={tvShowData.data} />
       </Suspense>
     </div>
   );

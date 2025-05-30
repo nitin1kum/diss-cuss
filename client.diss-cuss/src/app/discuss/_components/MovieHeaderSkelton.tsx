@@ -2,6 +2,7 @@
 
 import Skeleton from "@/components/global/skelton";
 import React from "react";
+import ThreadsSkelton from "./ThreadsSkelton";
 
 const MovieHeaderSkelton = () => {
   return (
@@ -31,5 +32,14 @@ const MovieHeaderSkelton = () => {
     </div>
   );
 };
+
+export const DiscussSkeleton = () => {
+  return (
+    <>
+      <MovieHeaderSkelton/>
+      <ThreadsSkelton/>
+    </>
+  )
+}
 
 export default MovieHeaderSkelton;
