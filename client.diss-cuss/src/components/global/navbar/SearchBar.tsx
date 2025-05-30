@@ -93,7 +93,7 @@ const SearchBar = ({close}  : {close : () => void}) => {
           onChange={handleChange}
           onFocus={handleFocus}
         />
-        <button onClick={close} className="text-subtext h-full w-16 flex p-2 items-center justify-center bg-card"><X/></button>
+        <button onClick={close} className="text-subtext sm:hidden h-full w-16 flex p-2 items-center justify-center bg-card"><X/></button>
       </div>
       {showType && (
         <div className="absolute top-full mt-3 bg-card w-24 text-subtext border border-border shadow-ll">
