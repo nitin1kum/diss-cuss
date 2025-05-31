@@ -74,7 +74,7 @@ model Like {
   liked     Boolean
 
   user User   @relation(fields: [user_id], references: [id])
-  item Thread @relation(fields: [thread_id], references: [id])
+  thread Thread @relation(fields: [thread_id], references: [id])
 }
 
 enum Role {

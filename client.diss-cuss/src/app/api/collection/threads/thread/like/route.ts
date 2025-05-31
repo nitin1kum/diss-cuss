@@ -27,24 +27,41 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Like removed successfully" });
       }
     } else {
-      const like = await prisma.like.upsert({
+      const like = await prisma.like.findFirst({
         where: {
-          user_id_thread_id: {
-            user_id: session.user.id,
-            thread_id: thread_id,
-          },
-        },
-        update: {
-          liked: liked === 1,
-        },
-        create: {
           user_id: session.user.id,
           thread_id: thread_id,
-          liked: liked === 1,
         },
       });
 
       if (like) {
+        const updatedLike = await prisma.like.update({
+          where: {
+            id: like.id,
+          },
+          data: {
+            liked: liked === 1,
+          },
+        });
+
+        if (updatedLike) {
+          return NextResponse.json({ message: "Like updated successfully" });
+        }
+        return NextResponse.json(
+          { message: "Error updating like" },
+          { status: 400 }
+        );
+      }
+
+      const newLike = await prisma.like.create({
+        data: {
+          liked: liked === 1,
+          user_id: session.user.id,
+          thread_id: thread_id,
+        },
+      });
+
+      if (newLike) {
         return NextResponse.json({ message: "Like updated successfully" });
       }
     }
