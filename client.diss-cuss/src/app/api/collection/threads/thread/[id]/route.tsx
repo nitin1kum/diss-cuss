@@ -10,43 +10,74 @@ export async function GET(
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions);
-    const user_id = session?.user.id || "";
-    const thread = await prisma.thread.findMany({
-      where: {
-        parent_id: id,
-        isReply: true,
-      },
-      include: {
-        _count: {
-          select: {
-            likes: {
-              where: {
-                liked: true,
+    let thread = null;
+    if (session && session.user) {
+      thread = await prisma.thread.findMany({
+        where: {
+          parent_id: id,
+          isReply: true,
+        },
+        include: {
+          _count: {
+            select: {
+              likes: {
+                where: {
+                  liked: true,
+                },
               },
             },
           },
-        },
-        replies: {
-          select: {
-            id: true,
+          replies: {
+            select: {
+              id: true,
+            },
+          },
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+          likes: {
+            where: {
+              user_id: session.user.id,
+            },
+            select: {
+              liked: true,
+            },
           },
         },
-        user: {
-          select: {
-            username: true,
-            image: true,
+      });
+    } else {
+      thread = await prisma.thread.findMany({
+        where: {
+          parent_id: id,
+          isReply: true,
+        },
+        include: {
+          _count: {
+            select: {
+              likes: {
+                where: {
+                  liked: true,
+                },
+              },
+            },
+          },
+          replies: {
+            select: {
+              id: true,
+            },
+          },
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
           },
         },
-        likes : {
-          where : {
-            user_id
-          },
-          select : {
-            liked : true
-          }
-        }
-      },
-    });
+      });
+    }
 
     return NextResponse.json({
       thread,

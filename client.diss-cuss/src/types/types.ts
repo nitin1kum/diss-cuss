@@ -246,7 +246,7 @@ export type ThreadProps = {
   _count: {
     likes: number;
   };
-  likes: {
+  likes?: {
     liked: boolean;
   }[];
 } & {

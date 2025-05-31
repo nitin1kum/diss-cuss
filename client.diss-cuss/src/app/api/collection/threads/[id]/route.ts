@@ -17,58 +17,100 @@ export async function GET(
       50
     );
 
-    const user_id = session?.user.id || "";
-    const threads = await prisma.thread.findMany({
-      where: {
-        discussion_id: id,
-        isReply: false,
-      },
-      include: {
-        replies: {
-          select: {
-            id: true,
+    let threads = [];
+
+    if (session && session.user) {
+      threads = await prisma.thread.findMany({
+        where: {
+          discussion_id: id,
+          isReply: false,
+        },
+        include: {
+          replies: {
+            select: {
+              id: true,
+            },
+          },
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: {
+                where: {
+                  liked: true,
+                },
+              },
+            },
+          },
+          likes: {
+            where: {
+              user_id: session.user.id,
+            },
+            select: {
+              liked: true,
+            },
           },
         },
-        user: {
-          select: {
-            username: true,
-            image: true,
-          },
-        },
-        _count: {
-          select: {
+        orderBy: [
+          {
             likes: {
-              where: {
-                liked: true,
+              _count: "desc", // order by count of related likes descending
+            },
+          },
+          { createdAt: "desc" },
+        ],
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+    } else {
+      threads = await prisma.thread.findMany({
+        where: {
+          discussion_id: id,
+          isReply: false,
+        },
+        include: {
+          replies: {
+            select: {
+              id: true,
+            },
+          },
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: {
+                where: {
+                  liked: true,
+                },
               },
             },
           },
         },
-        likes : {
-          where : {
-            user_id : user_id
+        orderBy: [
+          {
+            likes: {
+              _count: "desc", // order by count of related likes descending
+            },
           },
-          select : {
-            liked : true
-          }
-        }
-      },
-      orderBy: [
-        {
-          likes: {
-            _count: "desc", // order by count of related likes descending
-          },
-        },
-        { createdAt: "desc" },
-      ],
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+          { createdAt: "desc" },
+        ],
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+    }
 
     const threadCount = await prisma.thread.count({
       where: {
         discussion_id: id,
-        isReply : false
+        isReply: false,
       },
     });
 

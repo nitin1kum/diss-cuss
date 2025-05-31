@@ -37,7 +37,7 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
   const { data } = useSession();
   const [showReply, setShowReply] = useState(level < LIMIT  && !(level%3 === 0));
   const [liked, setLiked] = useState<1 | 0 | -1>(
-    thread.likes.length > 0 ? (thread.likes[0].liked ? 1 : -1) : 0
+    (thread.likes && thread.likes.length > 0) ? (thread.likes[0].liked ? 1 : -1) : 0
   );
   const [childReply, setChildReply] = useState<ThreadResponse[] | null>(null);
   const [likeCount, setLikeCount] = useState(thread._count.likes);
