@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 type Props = {
   thread: ThreadProps;
@@ -243,9 +244,11 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
           <div className="box-border absolute right-full h-6 -translate-y-3 border-0 border-solid border-b-[2px] cursor-pointer w-[10px] sm:w-[17px] border-l-[2px] rounded-bl-[12px] group-hover:border-text border-subtext" />
         )}
         <div className="size-8 sm:size-9 rounded-full bg-sky-600 flex items-center justify-start overflow-hidden">
-          <img
+          <Image
             src={thread.user.image}
             alt="user image"
+            width={20}
+            height={20}
             className="w-full h-full object-cover"
           />
         </div>

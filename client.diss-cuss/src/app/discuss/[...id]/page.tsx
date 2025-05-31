@@ -9,15 +9,11 @@ import Head from "next/head";
 import { generateKeywords } from "@/utils/utilities";
 import { DiscussSkeleton } from "../_components/MovieHeaderSkelton";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<any>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<any> }) {
   try {
     // Fetch the discussion with its top thread (most likes)
-    const discussionId =(await params).id[1];
-    if(!discussionId) return null;
+    const discussionId = (await params).id[1];
+    if (!discussionId) return null;
 
     const discussion = await prisma.discussion.findUnique({
       where: { imdb_id: discussionId },
@@ -46,7 +42,11 @@ export async function generateMetadata({
 
     return {
       title: `${discussion.name} Discussion – Diss-Cuss`,
-      description: `${mainSnippet && mainThread ? mainSnippet + "by user" + mainThread.user.username : "Discussion about " + discussion.name}`,
+      description: `${
+        mainSnippet && mainThread
+          ? mainSnippet + "by user" + mainThread.user.username
+          : "Discussion about " + discussion.name
+      }`,
       keywords,
       openGraph: {
         title: `${discussion.name} Discussion – Diss-Cuss`,
@@ -77,7 +77,7 @@ export async function generateMetadata({
       metadataBase: new URL(`${process.env.NEXTBASE_URL}`),
       alternates: {},
     };
-  } catch(error) {
+  } catch (error) {
     return {
       title: "Discussion – Diss-Cuss",
       description: "Join the conversation about movie",
@@ -85,7 +85,7 @@ export async function generateMetadata({
   }
 }
 
-const generateJsonLD = async (discussion_id : string) => {
+const generateJsonLD = async (discussion_id: string) => {
   const popularThreads = await prisma.thread.findMany({
     where: {
       discussion_id,
@@ -99,16 +99,16 @@ const generateJsonLD = async (discussion_id : string) => {
       content: true,
       user: { select: { username: true } },
       _count: { select: { likes: true } },
-      discussion : {
-        select : {name : true,imdb_id : true},
-      }
+      discussion: {
+        select: { name: true, imdb_id: true },
+      },
     },
   });
 
-  if(popularThreads.length === 0) return [];
+  if (popularThreads.length === 0) return [];
 
   const mainThread = popularThreads[0];
-  const mainSnippet = mainThread.content
+  const mainSnippet = mainThread.content;
 
   // Build JSON-LD for the main thread + popular threads box
   const jsonLd = [
@@ -149,11 +149,14 @@ const generateJsonLD = async (discussion_id : string) => {
 
 const Discuss = async ({ params }: { params: Promise<any> }) => {
   const { id } = await params;
-  if (!id || id.length < 2) redirect("/");
+  if (!id || id.length < 2) {
+    redirect("/");
+  }
 
   const res = await fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/details?t=${id[0]}&id=${id[1]}`
-  ,{cache : "force-cache"});
+    `${process.env.NEXTBASE_URL}/api/collection/details?t=${id[0]}&id=${id[1]}`,
+    { cache: "force-cache", next: { revalidate: 60 * 60 * 24 * 30 } }
+  );
 
   if (!res.ok) {
     toast.error("Oops! Some error occurred");

@@ -6,6 +6,7 @@ import Link from "next/link";
 import "react-quill-new/dist/quill.snow.css";
 import ToolBar from "./ToolBar";
 import { Loader2 } from "lucide-react";
+import DefaultLink from "../default-link";
 
 var formats = [
   "header",
@@ -64,12 +65,12 @@ const RichTextEditor: React.FC<Props> = ({
       {!data ? (
         <div className="flex text-text items-center gap-3 justify-center py-10">
           Sign in to comment
-          <Link
+          <DefaultLink
             href={"/auth/sign-in"}
             className="flex w-fit gap-2 items-center text-text p-2 rounded-md bg-accent brightness-90 hover:brightness-100"
           >
             Sign In
-          </Link>
+          </DefaultLink>
         </div>
       ) : (
         <>

@@ -2,14 +2,16 @@
 
 import { SearchResponse, TmdbSearchResult } from "@/types/types";
 import { ChevronDown, Loader, Search, X } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import DefaultLink from "../default-link";
+import { useLoader } from "@/contexts/LoaderStateProvider";
 
 const SearchBar = () => {
   const [isPending, setIsPending] = useState(false);
   const [showList, setShowList] = useState<boolean>(false);
   const router = useRouter();
+  const context = useLoader();
   const [showNav, setShowNav] = useState(false)
   const [showType, setShowType] = useState<boolean>(false);
   const [list, setList] = useState<TmdbSearchResult[] | null>(null);
@@ -78,6 +80,10 @@ const SearchBar = () => {
   const handleSubmit = (e : React.FormEvent) => {
     e.preventDefault();
     if(value === "") return;
+    if(context){
+      context.setShowLoader(true);
+      context.setProgress(20);
+    }
     router.push(`/search/${type}/${value}`)
   }
 
@@ -146,7 +152,7 @@ const SearchBar = () => {
                 {list && list.length > 0 ? (
                   <>
                     {list.map((item, cnt) => (
-                      <Link
+                      <DefaultLink
                         href={`/discuss/${type}/${item.id}`}
                         key={item.id}
                         title={
@@ -169,7 +175,7 @@ const SearchBar = () => {
                             ? item.release_date
                             : item.first_air_date}
                         </span>
-                      </Link>
+                      </DefaultLink>
                     ))}
                   </>
                 ) : (

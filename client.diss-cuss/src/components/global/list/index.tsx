@@ -1,7 +1,7 @@
 import { TmdbSearchResult } from "@/types/types";
 import { Star } from "lucide-react";
-import Link from "next/link";
 import React from "react";
+import DefaultLink from "../default-link";
 
 type Props = {
   heading: string;
@@ -19,7 +19,7 @@ const List = ({ heading, data }: Props) => {
               ? discuss.title || discuss.original_title
               : discuss.name || discuss.original_name;
           return (
-            <Link
+            <DefaultLink
               href={`/discuss/${discuss.media_type}/${discuss.id}`}
               key={discuss.id}
               className="rounded-md shadow-xl hover:shadow-2xl relative group"
@@ -58,7 +58,7 @@ const List = ({ heading, data }: Props) => {
                   </span>
                 </div>
               </div>
-            </Link>
+            </DefaultLink>
           );
         })}
       </div>

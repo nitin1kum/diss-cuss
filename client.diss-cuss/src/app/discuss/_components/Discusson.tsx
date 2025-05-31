@@ -3,7 +3,6 @@ import React, { RefObject, useEffect, useState } from "react";
 import { Loader, Plus } from "lucide-react";
 import useSWRInfinite from "swr/infinite";
 import { toast } from "react-toastify";
-
 import RichTextEditor from "@/components/global/text-editor";
 import Thread from "@/components/global/thread";
 import ThreadsSkelton from "./ThreadsSkelton";
@@ -12,7 +11,7 @@ import { DiscussionThreadResponse, ThreadProps } from "@/types/types";
 import { useLoader } from "@/contexts/LoaderStateProvider";
 import UpdateLoader from "@/components/global/update-loader";
 
-const PAGE_LIMIT = 6;
+const PAGE_LIMIT = 10;
 
 export default function Discussion({
   discussion_id,
@@ -66,6 +65,10 @@ export default function Discussion({
   if (error) {
     console.error("Error fetching threads:", error);
     toast.error("Oops! Some error occurred");
+    if(context){
+      context.setProgress(100);
+      context.setShowLoader(false);
+    }
     return null;
   }
 
@@ -121,11 +124,10 @@ export default function Discussion({
 
   return (
     <div key={discussion_id}>
-      <UpdateLoader isLoading={isLoading}/>
       <h2 className="pt-16 text-text font-medium tracking-wide">
         Discussion{totalDiscussion > 0 && "s"} ({totalDiscussion})
       </h2>
-
+    <UpdateLoader isLoading={isLoading}/>
       <div className="flex gap-2 mb-10 items-center justify-between">
         <h3 className="text-text m-0 font-medium tracking-wide">{name}</h3>
         <button

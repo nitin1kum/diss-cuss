@@ -3,13 +3,16 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeClosed, Loader } from "lucide-react";
 import { toast } from "react-toastify";
+import UpdateLoader from "@/components/global/update-loader";
+import { useLoader } from "@/contexts/LoaderStateProvider";
+import DefaultLink from "@/components/global/default-link";
 
 export default function SignInPage() {
   const router = useRouter();
+  const context = useLoader();
   const [email, setEmail] = useState("");
   const [loading,setLoading] = useState(false);
   const [showPassword,setShowPassword] = useState(false);
@@ -36,6 +39,10 @@ export default function SignInPage() {
         setError(res.error);
       } else {
         toast.success("Login successfully")
+        if(context){
+          context.setShowLoader(true);
+          context.setProgress(20);
+        }
         router.push("/");
       }
     } catch (error) {
@@ -52,15 +59,16 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen p-2 bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <UpdateLoader />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-text">
           Sign in to your account
         </h2>
         <p className="mt-2 text-center text-sm text-subtext max-w">
           Or{" "}
-          <Link href="/auth/sign-up" className="font-medium">
+          <DefaultLink href="/auth/sign-up" className="font-medium">
             create a new account
-          </Link>
+          </DefaultLink>
         </p>
       </div>
 

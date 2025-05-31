@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeClosed, Loader } from "lucide-react";
+import UpdateLoader from "@/components/global/update-loader";
+import { useLoader } from "@/contexts/LoaderStateProvider";
+import DefaultLink from "@/components/global/default-link";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const context = useLoader();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,6 +38,10 @@ export default function SignUpPage() {
       });
 
       if (res.ok) {
+        if(context){
+          context.setProgress(20);
+          context.setShowLoader(true);
+        }
         return router.push("/auth/verify/validation");
       } else {
         const data = await res.json();
@@ -54,15 +61,16 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen p-2 bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <UpdateLoader />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-text">
           Create new account
         </h2>
         <p className="mt-2 text-center text-sm text-subtext max-w">
           Or{" "}
-          <Link href="/auth/sign-in" className="font-medium">
+          <DefaultLink href="/auth/sign-in" className="font-medium">
             Login to existing account
-          </Link>
+          </DefaultLink>
         </p>
       </div>
 

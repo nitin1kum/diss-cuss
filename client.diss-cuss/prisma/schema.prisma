@@ -1,21 +1,14 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id            String    @unique @default(uuid())
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   username      String    @default("anonyms")
   email         String    @unique
@@ -29,8 +22,8 @@ model User {
 }
 
 model Account {
-  id                String   @id @default(uuid())
-  userId            String
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
   type              String
   provider          String
   providerAccountId String
@@ -49,7 +42,7 @@ model Account {
 }
 
 model Discussion {
-  id      String   @unique @default(uuid())
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
   name    String
   type    String   @default("movie")
   poster  String   @default("/default_discussion.png")
@@ -58,36 +51,33 @@ model Discussion {
 }
 
 model Thread {
-  id            String     @id @default(uuid())
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
   discussion    Discussion @relation(fields: [discussion_id], references: [id])
-  discussion_id String
+  discussion_id String     @db.ObjectId
   user          User       @relation(fields: [user_id], references: [id])
-  user_id       String
+  user_id       String     @db.ObjectId
   content       String
-  html          String  
+  html          String
   likes         Like[]
   isReply       Boolean    @default(false)
-  parent        Thread?    @relation("CommentReplies", fields: [parent_id], references: [id])
-  parent_id     String?
+  parent        Thread?    @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent_id     String?    @db.ObjectId
   replies       Thread[]   @relation("CommentReplies")
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt()
 }
 
 model Like {
-  user_id   String
-  thread_id String
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  user_id   String  @db.ObjectId
+  thread_id String  @db.ObjectId
   liked     Boolean
 
   user User   @relation(fields: [user_id], references: [id])
   item Thread @relation(fields: [thread_id], references: [id])
-
-  @@id([user_id, thread_id])
 }
 
 enum Role {
   USER
   ADMIN
 }
-
-

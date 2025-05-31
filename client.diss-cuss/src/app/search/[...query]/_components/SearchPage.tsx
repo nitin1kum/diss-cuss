@@ -9,6 +9,7 @@ import SearchSkelton from "./SearchSkelton";
 import List from "@/components/global/list";
 import { Loader } from "lucide-react";
 import UpdateLoader from "@/components/global/update-loader";
+import { useLoader } from "@/contexts/LoaderStateProvider";
 
 type Props = {
   type: "movie" | "tv";
@@ -18,6 +19,7 @@ type Props = {
 const PAGE_SIZE = 10; // or whatever your API returns per page
 
 const SearchPage = ({ type, name }: Props) => {
+  const context = useLoader();
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.results.length) return null; // end
     return `/api/collection/search?q=${encodeURIComponent(
@@ -34,12 +36,16 @@ const SearchPage = ({ type, name }: Props) => {
     );
 
   if (error) {
+    if (context) {
+      context.setProgress(100);
+      context.setShowLoader(false);
+    }
     toast.error("Oops! Some error occurred.");
     return <SearchSkelton />;
   }
 
   const items = data ? data.flatMap((page) => page.results) : [];
-  items.forEach((item) => item.media_type = type);
+  items.forEach((item) => (item.media_type = type));
 
   const isReachingEnd =
     data && data[data.length - 1]?.results?.length < PAGE_SIZE;
@@ -48,7 +54,7 @@ const SearchPage = ({ type, name }: Props) => {
     <SearchSkelton />
   ) : (
     <div className="p-4">
-      <UpdateLoader isLoading={isLoading}/>
+      <UpdateLoader isLoading={isLoading} />
       <h2 className="pt-4 text-center text-4xl w-full text-text">Diss-Cuss</h2>
 
       <h1 className="text-text">Results for "{decodeURIComponent(name)}"</h1>
@@ -61,7 +67,11 @@ const SearchPage = ({ type, name }: Props) => {
             onClick={() => setSize(size + 1)}
             disabled={isValidating || isLoading}
           >
-            {isValidating ? <Loader className="animate-spin size-5"/> : "Load more"}
+            {isValidating ? (
+              <Loader className="animate-spin size-5" />
+            ) : (
+              "Load more"
+            )}
           </button>
         </div>
       )}

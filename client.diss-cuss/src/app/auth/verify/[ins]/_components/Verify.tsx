@@ -1,4 +1,7 @@
 "use client"
+import DefaultLink from "@/components/global/default-link";
+import UpdateLoader from "@/components/global/update-loader";
+import { useLoader } from "@/contexts/LoaderStateProvider";
 import { Loader } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -7,10 +10,11 @@ import React, { useEffect, useState } from "react";
 
 const Verify = ({instruction} : {instruction : string}) => {
   const { data } = useSession();
+  const context = useLoader();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [cooldown, setCooldown] = useState(0); // ⏳ cooldown in seconds
+  const [cooldown, setCooldown] = useState(0); // cooldown in seconds
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -23,6 +27,10 @@ const Verify = ({instruction} : {instruction : string}) => {
   }, [cooldown]);
 
   if (data && data.user) {
+    if(context){
+      context.setProgress(20);
+      context.setShowLoader(true)
+    }
     return redirect("/");
   }
 
@@ -61,6 +69,7 @@ const Verify = ({instruction} : {instruction : string}) => {
 
   return (
     <div className="min-h-screen p-4 bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <UpdateLoader />
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <h2 className="text-3xl font-extrabold text-text">
           Verify Your Email Address
@@ -114,12 +123,12 @@ const Verify = ({instruction} : {instruction : string}) => {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          <Link
+          <DefaultLink
             href="/auth/sign-in"
             className="font-medium text-indigo-600 hover:text-indigo-500"
           >
             Back to Sign In
-          </Link>
+          </DefaultLink>
         </p>
       </div>
     </div>
