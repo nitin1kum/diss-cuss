@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { options } from "../option";
 import { prisma } from "@/lib/prisma";
 import { TmdbMediaDetails } from "@/types/types";
+import fs from "fs";
+import { updateSitemap } from "@/action/updateSitemap";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("t");
     const id = searchParams.get("id");
-    if(!type || !id){
-      throw new Error("Query not defined.")
+    if (!type || !id) {
+      throw new Error("Query not defined.");
     }
 
     const res = await fetch(
@@ -49,8 +51,8 @@ export async function GET(req: NextRequest) {
         data: {
           imdb_id: `${mediaInfo.id}`,
           name,
-          type : type || "movie",
-          poster : mediaInfo.poster_path || "/default_poster.jpg"
+          type: type || "movie",
+          poster: mediaInfo.poster_path || "/default_poster.jpg",
         },
         select: {
           id: true,
@@ -58,6 +60,10 @@ export async function GET(req: NextRequest) {
       });
 
       if (newDiscussion) {
+        await updateSitemap(
+          `${process.env.NEXTBASE_URL}/discuss/${type}/${id}`,
+          mediaInfo.poster_path || undefined
+        );
         return NextResponse.json(
           {
             data: mediaInfo,
