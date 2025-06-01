@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { Sitemap } from "@/types/types";
 import { MetadataRoute } from "next";
 
+export const revalidate = 60
+
 export async function generateSitemaps() {
   const discussions = await prisma.discussion.count();
   const length = (discussions + 44999) / 45000;
