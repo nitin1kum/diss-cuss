@@ -42,7 +42,7 @@ const Home = async () => {
           Diss-Cuss
         </h2>
         {upcomingMoviesData && upcomingMoviesData.data && <List heading="upcoming movies" data={upcomingMoviesData.data} />}
-        {movieData && movieData.data > 0 && <List heading="popular movies" data={movieData.data} />}
+        {movieData && movieData.data  && <List heading="popular movies" data={movieData.data} />}
         {tvShowData && tvShowData.data && <List heading="popular web series / TV" data={tvShowData.data} />}
       </Suspense>
     </div>
