@@ -1,3 +1,5 @@
+import { Languages } from "next/dist/lib/metadata/types/alternative-urls-types";
+
 type TmdbMovieResult = {
   media_type: "movie";
   adult: boolean;
@@ -266,3 +268,21 @@ export type ThreadResponse = {
   thread: ThreadProps[];
   message: string;
 };
+
+export type Sitemap = Array<{
+  url: string
+  lastModified?: string | Date
+  changeFrequency?:
+    | 'always'
+    | 'hourly'
+    | 'daily'
+    | 'weekly'
+    | 'monthly'
+    | 'yearly'
+    | 'never'
+  priority?: number
+  alternates?: {
+    languages?: Languages<string>
+  },
+  images? : string[]
+}>
