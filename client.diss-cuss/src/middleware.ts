@@ -35,10 +35,6 @@ export async function middleware(request: NextRequest) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    // Always run middleware on auth pages
     "/auth/:path*",
-
-    // Exclude static + sitemap routes from middleware
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap_index.xml|api/.*|sitemap/.*).*)",
   ],
 };
