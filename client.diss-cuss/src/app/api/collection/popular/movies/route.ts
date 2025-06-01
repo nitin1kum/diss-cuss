@@ -4,7 +4,7 @@ import { options } from "../../option";
 export async function GET() {
   try {
     const res = await fetch(
-      `${process.env.TMDB_BASE_URL}/movie/popular?language=en-US&page=1`,
+      `${process.env.TMDB_BASE_URL}/movie/popular?language=en-US&page=1&sort_by=popularity.desc`,
       options
     );
     if (!res.ok) throw new Error("Error while geting popular movies");

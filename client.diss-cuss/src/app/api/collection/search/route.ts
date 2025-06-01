@@ -15,7 +15,7 @@ export async function GET(
     }
 
     const res = await fetch(
-      `${process.env.TMDB_BASE_URL}/search/${type}?query=${query}&language=en-US&page=${page}`
+      `${process.env.TMDB_BASE_URL}/search/${type}?query=${query}&language=en-US&page=${page}&sort_by=popularity.desc`
     ,options);
     
     const data = await res.json();
