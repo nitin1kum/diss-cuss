@@ -173,7 +173,7 @@ export default function SignUpPage() {
                 {loading ? (
                   <Loader className="size-5 animate-spin" />
                 ) : (
-                  "Sing Up"
+                  "S Up"
                 )}
               </button>
             </div>

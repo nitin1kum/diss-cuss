@@ -142,7 +142,7 @@ export default function SignInPage() {
                 disabled={loading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                {loading ? <Loader className="size-5 animate-spin"/> : "Sing In"}
+                {loading ? <Loader className="size-5 animate-spin"/> : "S In"}
               </button>
             </div>
           </form>

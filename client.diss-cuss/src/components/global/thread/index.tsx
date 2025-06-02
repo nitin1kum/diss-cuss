@@ -51,8 +51,8 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
   } = useSWR("/api/collection/threads/thread/" + thread.id, fetcher);
 
   if (repliesError) {
-    toast.error("Error whilie fetching replies");
     console.log("error while fetching thread - ", repliesError);
+    return null;
   }
 
   // skelton
