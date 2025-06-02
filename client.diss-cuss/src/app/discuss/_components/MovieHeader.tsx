@@ -29,7 +29,7 @@ const MovieHero = ({ media }: { media: TmdbMediaDetails }) => {
       {/* Poster */}
       <div>
         <Image
-          src={"https://image.tmdb.org/t/p/w1280/" + media.poster_path!}
+          src={media.poster_path ? "https://image.tmdb.org/t/p/w1280/" + media.poster_path : "/default_poster.png"}
           alt="media poster"
           width={300}
           height={300}

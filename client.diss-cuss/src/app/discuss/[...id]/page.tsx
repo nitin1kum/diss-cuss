@@ -155,7 +155,7 @@ const Discuss = async ({ params }: { params: Promise<any> }) => {
 
   const res = await fetch(
     `${process.env.NEXTBASE_URL}/api/collection/details?t=${id[0]}&id=${id[1]}`,
-    { cache: "force-cache", next: { revalidate: 60 * 60 * 24 * 30 } }
+    { cache: "no-store", next: { revalidate: 60 * 60 * 24 * 30 } }
   );
 
   if (!res.ok) {

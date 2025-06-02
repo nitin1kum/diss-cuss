@@ -64,7 +64,7 @@ model Thread {
   parent_id     String?    @db.ObjectId
   replies       Thread[]   @relation("CommentReplies")
   createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt()
+  updatedAt     DateTime?  @updatedAt()
 }
 
 model Like {
@@ -73,7 +73,7 @@ model Like {
   thread_id String  @db.ObjectId
   liked     Boolean
 
-  user User   @relation(fields: [user_id], references: [id])
+  user   User   @relation(fields: [user_id], references: [id])
   thread Thread @relation(fields: [thread_id], references: [id])
 }
 
