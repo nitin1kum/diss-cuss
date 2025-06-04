@@ -35,10 +35,10 @@ const MovieHeaderSkelton = () => {
 
 export const DiscussSkeleton = () => {
   return (
-    <>
+    <div className="container px-6 lg:max-w-7xl m-auto py-6">
       <MovieHeaderSkelton/>
       <ThreadsSkelton/>
-    </>
+    </div>
   )
 }
 
