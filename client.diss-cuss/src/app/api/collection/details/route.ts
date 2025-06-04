@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { options } from "../option";
 import { prisma } from "@/lib/prisma";
 import { TmdbMediaDetails } from "@/types/types";
-import fs from "fs";
 import { updateSitemap } from "@/action/updateSitemap";
 
 export async function GET(req: NextRequest) {
@@ -79,7 +78,7 @@ export async function GET(req: NextRequest) {
     if (discussion) {
       const popularThreads = await prisma.thread.findMany({
         where: {
-          discussion_id : discussion.id,
+          discussion_id: discussion.id,
           isReply: false,
         },
         orderBy: { likes: { _count: "desc" } },
@@ -96,51 +95,53 @@ export async function GET(req: NextRequest) {
         },
       });
 
-      if (popularThreads.length === 0) return [];
+      let jsonLd : any = [];
 
-      const mainThread = popularThreads[0];
-      const mainSnippet = mainThread.content;
+      if (popularThreads.length !== 0) {
+        const mainThread = popularThreads[0];
+        const mainSnippet = mainThread.content;
 
-      const jsonLd = [
-        {
-          "@context": "https://schema.org",
-          "@type": "DiscussionForumPosting",
-          headline: `${mainThread.user.username}'s top post`,
-          articleBody: mainSnippet,
-          author: { "@type": "Person", name: mainThread.user.username },
-          url: `${process.env.NEXTBASE_URL}/discussion/${mainThread.discussion.imdb_id}`,
-          interactionStatistic: {
-            "@type": "InteractionCounter",
-            interactionType: "https://schema.org/LikeAction",
-            userInteractionCount: mainThread._count.likes,
-          },
-        },
-        {
-          "@context": "https://schema.org",
-          "@type": "DiscussionForum",
-          name: `${mainThread.discussion.name} – Popular Threads`,
-          url: `${process.env.NEXTBASE_URL}/discussion/${mainThread.discussion.imdb_id}`,
-          discussionForumPosting: popularThreads.map((t) => ({
+        jsonLd =  [
+          {
+            "@context": "https://schema.org",
             "@type": "DiscussionForumPosting",
-            headline: `${t.user.username}'s thread snippet`,
-            articleBody: t.content.slice(0, 80),
-            author: { "@type": "Person", name: t.user.username },
-            url: `${process.env.NEXTBASE_URL}/discussion/${mainThread.discussion.imdb_id}?thread=${t.id}`,
+            headline: `${mainThread.user.username}'s top post`,
+            articleBody: mainSnippet,
+            author: { "@type": "Person", name: mainThread.user.username },
+            url: `${process.env.NEXTBASE_URL}/discussion/${mainThread.discussion.imdb_id}`,
             interactionStatistic: {
               "@type": "InteractionCounter",
               interactionType: "https://schema.org/LikeAction",
-              userInteractionCount: t._count.likes,
+              userInteractionCount: mainThread._count.likes,
             },
-          })),
-        },
-      ];
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "DiscussionForum",
+            name: `${mainThread.discussion.name} – Popular Threads`,
+            url: `${process.env.NEXTBASE_URL}/discussion/${mainThread.discussion.imdb_id}`,
+            discussionForumPosting: popularThreads.map((t) => ({
+              "@type": "DiscussionForumPosting",
+              headline: `${t.user.username}'s thread snippet`,
+              articleBody: t.content.slice(0, 80),
+              author: { "@type": "Person", name: t.user.username },
+              url: `${process.env.NEXTBASE_URL}/discussion/${mainThread.discussion.imdb_id}?thread=${t.id}`,
+              interactionStatistic: {
+                "@type": "InteractionCounter",
+                interactionType: "https://schema.org/LikeAction",
+                userInteractionCount: t._count.likes,
+              },
+            })),
+          },
+        ];
+      }
 
       return NextResponse.json(
         {
           data: mediaInfo,
           discussion_id: discussion.id,
           message: "Data fetched Successfully",
-          jsonLd
+          jsonLd,
         },
         { status: 200 }
       );
