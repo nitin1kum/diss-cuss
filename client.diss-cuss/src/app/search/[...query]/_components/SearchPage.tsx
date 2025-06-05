@@ -40,6 +40,8 @@ const SearchPage = ({ type, name }: Props) => {
       context.setProgress(100);
       context.setShowLoader(false);
     }
+    console.log("error while fetching data - ", error);
+
     toast.error("Oops! Some error occurred.");
     return <SearchSkelton />;
   }
@@ -53,11 +55,19 @@ const SearchPage = ({ type, name }: Props) => {
   return isLoading ? (
     <SearchSkelton />
   ) : (
-    <div className="p-4">
+    <div className="p-4 min-h-[calc(100vh_-_56.8px)] sm:min-h-[calc(100vh_-_32.3px)]">
       <UpdateLoader isLoading={isLoading} />
       <h2 className="pt-4 text-center text-4xl w-full text-text">Diss-Cuss</h2>
 
       <h1 className="text-text">Results for "{decodeURIComponent(name)}"</h1>
+      {items.length === 0 && (
+        <p
+          className="text-subtext
+       text-lg text-center mt-10"
+        >
+          No result found for "{decodeURIComponent(name)}"
+        </p>
+      )}
       <List heading="" data={items} />
 
       {!isReachingEnd && (

@@ -38,6 +38,7 @@ export default function SignInPage() {
       if (res?.error) {
         setError(res.error);
       } else {
+        
         toast.success("Login successfully")
         if(context){
           context.setShowLoader(true);
@@ -58,7 +59,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen p-2 bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="p-2 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <UpdateLoader />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-text">
@@ -142,7 +143,7 @@ export default function SignInPage() {
                 disabled={loading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                {loading ? <Loader className="size-5 animate-spin"/> : "S In"}
+                {loading ? <Loader className="size-5 animate-spin"/> : "Sign In"}
               </button>
             </div>
           </form>

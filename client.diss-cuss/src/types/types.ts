@@ -203,7 +203,7 @@ export type DetailsResponse = {
   data: TmdbMediaDetails;
   discussion_id: string;
   message: string;
-  jsonLd : [] | null | undefined
+  jsonLd : any;
 };
 
 export type DiscussionThreadResponse = {

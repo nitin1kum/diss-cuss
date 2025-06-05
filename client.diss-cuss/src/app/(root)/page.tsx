@@ -8,19 +8,22 @@ import { TmdbSearchResult } from "@/types/types";
 
 const Home = async () => {
   const moviePromise = fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/popular/movies`
+    `${process.env.NEXTBASE_URL}/api/collection/popular/movies`,
+    { next: { revalidate: 60 * 60 * 24 } }
   );
   const tvShowPromise = fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/popular/tv`
+    `${process.env.NEXTBASE_URL}/api/collection/popular/tv`,
+    { next: { revalidate: 60 * 60 * 24 } }
   );
   const upcomingMovies = fetch(
     `${process.env.NEXTBASE_URL}/api/collection/upcoming`,
+    { next: { revalidate: 60 * 60 * 24 } }
   );
 
-  const [movieRes, tvShowRes,upcomingMoviesRes] = await Promise.all([
+  const [movieRes, tvShowRes, upcomingMoviesRes] = await Promise.all([
     moviePromise,
     tvShowPromise,
-    upcomingMovies
+    upcomingMovies,
   ]);
 
   // Optionally: check for errors
@@ -41,9 +44,15 @@ const Home = async () => {
         <h2 className="pt-4 text-center text-4xl w-full text-text">
           Diss-Cuss
         </h2>
-        {upcomingMoviesData && upcomingMoviesData.data && <List heading="upcoming movies" data={upcomingMoviesData.data} />}
-        {movieData && movieData.data  && <List heading="popular movies" data={movieData.data} />}
-        {tvShowData && tvShowData.data && <List heading="popular web series / TV" data={tvShowData.data} />}
+        {upcomingMoviesData && upcomingMoviesData.data && (
+          <List heading="upcoming movies" data={upcomingMoviesData.data} />
+        )}
+        {movieData && movieData.data && (
+          <List heading="popular movies" data={movieData.data} />
+        )}
+        {tvShowData && tvShowData.data && (
+          <List heading="popular web series / TV" data={tvShowData.data} />
+        )}
       </Suspense>
     </div>
   );

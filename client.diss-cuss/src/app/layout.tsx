@@ -79,11 +79,11 @@ export default function RootLayout({
             >
               <RouteLoader />
               <Navbar />
-              <div className="pt-16 min-h-screen">{children}</div>
+              <div className="pt-16 place-content-center min-h-[calc(100vh_-_56.8px)] sm:min-h-[calc(100vh_-_32.3px)]">{children}</div>
               <Footer />
             </ThemeProvider>
           </AuthProvider>
-          <ToastContainer position="bottom-center" hideProgressBar limit={3} />
+          <ToastContainer position="bottom-center" hideProgressBar limit={1} />
         </LoaderProvider>
       </body>
     </html>

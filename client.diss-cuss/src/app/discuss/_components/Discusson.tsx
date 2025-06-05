@@ -64,8 +64,9 @@ export default function Discussion({
 
   if (error) {
     console.error("Error fetching threads:", error);
+
     toast.error("Oops! Some error occurred");
-    if(context){
+    if (context) {
       context.setProgress(100);
       context.setShowLoader(false);
     }
@@ -115,7 +116,8 @@ export default function Discussion({
       editor.current.getEditor().setText("");
       setShowEditor(false);
     } catch (err) {
-      console.error(err);
+      console.error("Error while posting thread - ", err);
+
       toast.error("Error while posting thread");
     } finally {
       setIsPending(false);
@@ -127,7 +129,7 @@ export default function Discussion({
       <h2 className="pt-16 text-text font-medium tracking-wide">
         Discussion{totalDiscussion > 0 && "s"} ({totalDiscussion})
       </h2>
-    <UpdateLoader isLoading={isLoading}/>
+      <UpdateLoader isLoading={isLoading} />
       <div className="flex gap-2 mb-10 items-center justify-between">
         <h3 className="text-text m-0 font-medium tracking-wide">{name}</h3>
         <button

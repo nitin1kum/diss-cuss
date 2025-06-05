@@ -60,7 +60,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen p-2 bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="p-2 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <UpdateLoader />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-text">
@@ -173,7 +173,7 @@ export default function SignUpPage() {
                 {loading ? (
                   <Loader className="size-5 animate-spin" />
                 ) : (
-                  "S Up"
+                  "Sign Up"
                 )}
               </button>
             </div>

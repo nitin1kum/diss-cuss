@@ -68,7 +68,7 @@ const Verify = ({instruction} : {instruction : string}) => {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="p-4 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <UpdateLoader />
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <h2 className="text-3xl font-extrabold text-text">
