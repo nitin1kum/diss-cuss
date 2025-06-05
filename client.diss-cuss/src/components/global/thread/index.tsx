@@ -30,14 +30,21 @@ type Props = {
 };
 
 const Thread = ({ thread, isLast, level, hideParent }: Props) => {
-  const LIMIT = window.innerWidth >= 1080 ? 10 : window.innerWidth >= 600 ? 6 : 3;
+  const LIMIT =
+    window.innerWidth >= 1080 ? 10 : window.innerWidth >= 600 ? 6 : 3;
   // wip optimize data loading
   // wip if level is greater than 3 than show editor in new thread page
   const [showEditor, setShowEditor] = useState(false);
   const { data } = useSession();
-  const [showReply, setShowReply] = useState(level < LIMIT  && !(level%3 === 0));
+  const [showReply, setShowReply] = useState(
+    level < LIMIT && !(level % 3 === 0)
+  );
   const [liked, setLiked] = useState<1 | 0 | -1>(
-    (thread.likes && thread.likes.length > 0) ? (thread.likes[0].liked ? 1 : -1) : 0
+    thread.likes && thread.likes.length > 0
+      ? thread.likes[0].liked
+        ? 1
+        : -1
+      : 0
   );
   const [childReply, setChildReply] = useState<ThreadResponse[] | null>(null);
   const [likeCount, setLikeCount] = useState(thread._count.likes);
@@ -65,7 +72,7 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
   const handleSubmit = async (editor: RefObject<ReactQuill | null>) => {
     if (!editor || !editor.current) return;
     const html = editor.current.getEditor().getSemanticHTML();
-    const content = editor.current.getEditor().getText()
+    const content = editor.current.getEditor().getText();
     if (editor.current.getEditor().getText().length >= 3) {
       try {
         setIsPending(true);
@@ -102,6 +109,7 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
             thread: [resData, ...prev.thread],
           };
         }, false);
+
         toast.success("Thread posted successfully");
         editor.current.getEditor().setText("");
         setShowEditor(false);
@@ -220,10 +228,9 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
   };
 
   const handleShowReplies = () => {
-    if(level < LIMIT - 1){
-      setShowReply(!showReply)
-    }
-    else{
+    if (level < LIMIT - 1) {
+      setShowReply(!showReply);
+    } else {
       setShowReply(hideParent(level, replyData));
     }
   };
@@ -261,8 +268,14 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
               • {calculateTime(new Date(thread.createdAt))}
             </span>
           </div>
-          {!thread.isReply && <span className="bg-sky-500/20 px-2 text-xs rounded-full m-0 w-fit leading-tight
-          ">Main thread</span>}
+          {!thread.isReply && (
+            <span
+              className="bg-sky-500/20 px-2 text-xs rounded-full m-0 w-fit leading-tight
+          "
+            >
+              Main thread
+            </span>
+          )}
         </div>
       </header>
       {/* content */}
@@ -270,7 +283,7 @@ const Thread = ({ thread, isLast, level, hideParent }: Props) => {
       {/* action */}
       <div className=" pl-7 sm:pl-9 text-subtext" key={thread.id}>
         <div
-          className="py-1 md:max-w-[600px] break-words" 
+          className="py-1 md:max-w-[600px] break-words"
           dangerouslySetInnerHTML={{ __html: thread.html || thread.content }}
         />
         <div className="flex relative items-center gap-2 mt-1">
