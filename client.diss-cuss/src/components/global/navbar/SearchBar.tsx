@@ -12,7 +12,7 @@ const SearchBar = () => {
   const [showList, setShowList] = useState<boolean>(false);
   const router = useRouter();
   const context = useLoader();
-  const [showNav, setShowNav] = useState(false)
+  const [showNav, setShowNav] = useState(false);
   const [showType, setShowType] = useState<boolean>(false);
   const [list, setList] = useState<TmdbSearchResult[] | null>(null);
   const [type, setType] = useState<"movie" | "tv">("movie");
@@ -32,17 +32,18 @@ const SearchBar = () => {
     setShowList(true);
     setShowNav(true);
     document.addEventListener("click", handleClick);
-    function handleClick(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setShowList(false);
-        setShowNav(false)
-        containerRef.current.value = "";
-        setList([]);
-        document.removeEventListener("click", handleClick);
-      }
+  }
+
+  function handleClick(event: MouseEvent) {
+    if (
+      containerRef.current &&
+      !containerRef.current.contains(event.target as Node)
+    ) {
+      setShowList(false);
+      setShowNav(false);
+      containerRef.current.value = "";
+      setList([]);
+      document.removeEventListener("click", handleClick);
     }
   }
 
@@ -77,15 +78,23 @@ const SearchBar = () => {
     document.addEventListener("click", handleOutsideChange);
   };
 
-  const handleSubmit = (e : React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if(value === "") return;
-    if(context){
+    if (value === "") return;
+    if (context) {
       context.setShowLoader(true);
       context.setProgress(20);
     }
-    router.push(`/search/${type}/${value}`)
-  }
+    setShowList(false);
+    setShowNav(false);
+    if (containerRef.current) {
+      containerRef.current.value = "";
+      containerRef.current.blur();
+    }
+    setList([]);
+    document.removeEventListener("click", handleClick);
+    router.push(`/search/${type}/${value}`);
+  };
 
   useEffect(() => {
     setIsPending(false);
@@ -96,7 +105,11 @@ const SearchBar = () => {
       <button className="text-subtext" onClick={handleFocus}>
         <Search />
       </button>
-      <div className={`${showNav ? "flex" : "hidden"} sm:w-[300px] w-full absolute sm:bg-transparent bg-bg z-50 inset-0 top-0 sm:relative sm:flex items-center`}>
+      <div
+        className={`${
+          showNav ? "flex" : "hidden"
+        } sm:w-[300px] w-full absolute sm:bg-transparent bg-bg z-50 inset-0 top-0 sm:relative sm:flex items-center`}
+      >
         <div className="flex w-full ring-border-secondary rounded-full ring-[1px] overflow-hidden">
           <button
             onClick={handleTypeChange}
@@ -107,7 +120,10 @@ const SearchBar = () => {
             </span>
             <ChevronDown className="size-5" />
           </button>
-          <form onSubmit={handleSubmit} className="relative w-full flex justify-between">
+          <form
+            onSubmit={handleSubmit}
+            className="relative w-full flex justify-between"
+          >
             <input
               ref={containerRef}
               type="search"
