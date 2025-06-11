@@ -1,8 +1,10 @@
+import UpdateLoader from "@/components/global/update-loader";
 import React from "react";
 
 const PrivacyPolicy = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 leading-8 tracking-wider py-10 text-text">
+      <UpdateLoader/>
       <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
       <p className="mb-4">Effective Date: 25 May 2025</p>
 

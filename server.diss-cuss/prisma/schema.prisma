@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String?
+  username      String   @default("anonyms")
+  email         String   @unique
+  image         String   @default("/default_user.png")
+  password      String?
+  emailVerified DateTime? 
+  role          Role     @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  threads  Thread[]
+  likes    Like[]
+  accounts Account[]
+  refrestToken RefreshToken[]
+
+  @@index([email])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  user_id    String
+  user      User     @relation(fields: [user_id], references: [id])
+  expiresAt DateTime
+  usedAt DateTime?
+  @@index([expiresAt])
+}
+
+model Account {
+  id                String   @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Discussion {
+  id                   String   @id @default(uuid())
+  name                 String
+  type                 String   @default("movie")
+  poster_path          String   @default("/default_discussion.png")
+  imdb_id              String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  adult                Boolean  @default(false)
+  backdrop_path        String?
+  budget               String?
+  genres               Json[]
+  homepage             String?
+  origin_country       String[]
+  original_title       String
+  original_language    String
+  popularity           Decimal?
+  overview             String
+  threads              Thread[]
+  production_companies Json[]
+  release_date         String
+  revenue              String?
+  runtime              String?
+  status               String?
+  vote_average         String   @default("0")
+  vote_count           String   @default("0")
+
+  @@unique([imdb_id, type])
+}
+
+model Thread {
+  id            String   @id @default(uuid())
+  discussion_id String
+  user_id       String
+  content       String
+  html          String
+  isReply       Boolean  @default(false)
+  parent_id     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  discussion Discussion @relation(fields: [discussion_id], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  parent     Thread?    @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: SetNull)
+  replies    Thread[]   @relation("CommentReplies")
+
+  likes Like[]
+}
+
+model Like {
+  id        String  @id @default(uuid())
+  user_id   String
+  thread_id String
+  liked     Boolean
+
+  user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  thread Thread @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, thread_id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}

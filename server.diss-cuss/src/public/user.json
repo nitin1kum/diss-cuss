@@ -1,0 +1,165 @@
+[
+{
+  "_id": {
+    "$oid": "683d084fb2a72d2442e763a5"
+  },
+  "username": "rahul_1",
+  "email": "test11@gmail.com",
+  "image": "/default_user.png",
+  "password": "$2b$16$mwaPp.h/YiBQDfxjy34cdu3rCExm3l5fAto9yQwqxJY68ujhtBinm",
+  "emailVerified": true,
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff7588"
+  },
+  "name": "Ava Kim",
+  "username": "avak",
+  "email": "test01@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=21",
+  "password": "834729",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff758f"
+  },
+  "name": "Lucas Zhang",
+  "username": "lucaszh",
+  "email": "test08@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=28",
+  "password": "118293",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d088bb2a72d2442e763a6"
+  },
+  "username": "harxit",
+  "email": "test13@gmail.com",
+  "image": "/default_user.png",
+  "password": "$2b$16$Uj9jM/Cif58THJ4MaRocYOBaLPpJ114sspAE9fcFloRXx0hWNKIXi",
+  "emailVerified": true,
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff758e"
+  },
+  "name": "Mia Rossi",
+  "username": "miar",
+  "email": "test07@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=27",
+  "password": "709185",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff758d"
+  },
+  "name": "Noah O'Brien",
+  "username": "noaho",
+  "email": "test06@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=26",
+  "password": "432198",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff7590"
+  },
+  "name": "Chloe Dubois",
+  "username": "chloed",
+  "email": "test09@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=29",
+  "password": "564721",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff7589"
+  },
+  "name": "Leo Fernandez",
+  "username": "leo_fern",
+  "email": "test02@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=22",
+  "password": "927431",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff758c"
+  },
+  "name": "Sophie Müller",
+  "username": "sophiem",
+  "email": "test05@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=25",
+  "password": "764503",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0817b2a72d2442e763a4"
+  },
+  "username": "harsh@122",
+  "email": "test12@gmail.com",
+  "image": "/default_user.png",
+  "password": "$2b$16$EKvEqY4ERRqOCRr7hG5nYe4td3RHEbjQD8YNcWRVlvXOE/R/MALu.",
+  "emailVerified": true,
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d08b8b2a72d2442e763a7"
+  },
+  "username": "aarush",
+  "email": "test14@gmail.com",
+  "image": "/default_user.png",
+  "password": "$2b$16$n3/5YlXuogJBttnOToZzjOPh3kbyo02VhRugSepQxWcAy451Y4LEG",
+  "emailVerified": true,
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff7591"
+  },
+  "name": "Arjun Mehta",
+  "username": "arjunm",
+  "email": "test10@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=30",
+  "password": "329087",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff758a"
+  },
+  "name": "Isla Patel",
+  "username": "islap",
+  "email": "test03@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=23",
+  "password": "113458",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "683d0be6440229f86dff758b"
+  },
+  "name": "Kai Nakamura",
+  "username": "kain",
+  "email": "test04@gmail.com",
+  "emailVerified": true,
+  "image": "https://i.pravatar.cc/150?img=24",
+  "password": "582910",
+  "role": "USER"
+}]

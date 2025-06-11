@@ -7,19 +7,26 @@ import UpdateLoader from "@/components/global/update-loader";
 
 const Home = async () => {
   const moviePromise = fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/popular/movies`
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/popular/movies?page=1&limit=10`,
+    { next: { revalidate: 60*60*24 } }
   );
   const tvShowPromise = fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/popular/tv`
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/popular/tv?page=1&limit=10`,
+    { next: { revalidate: 60*60*24 } }
+  );
+  const upcomingMovies = fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/upcoming/movies?page=1&limit=10`,
+    { next: { revalidate: 60*60*24 } }
   );
 
-  const [movieRes, tvShowRes] = await Promise.all([
+  const [movieRes, tvShowRes, upcomingMoviesRes] = await Promise.all([
     moviePromise,
     tvShowPromise,
+    upcomingMovies,
   ]);
 
   // Optionally: check for errors
-  if (!movieRes.ok || !tvShowRes.ok) {
+  if (!movieRes.ok && !tvShowRes.ok && !upcomingMoviesRes.ok) {
     toast.error("Oops! Some error occurred");
     return <HomeSkelton />;
   }
@@ -27,6 +34,8 @@ const Home = async () => {
   // Parse JSON
   const movieData = await movieRes.json();
   const tvShowData = await tvShowRes.json();
+  const upcomingMoviesData = await upcomingMoviesRes.json();
+
   return (
     <div className="">
       <Suspense fallback={<HomeSkelton />}>
@@ -34,8 +43,15 @@ const Home = async () => {
         <h2 className="pt-4 text-center text-4xl w-full text-text">
           Diss-Cuss
         </h2>
-        <List heading="popular movies" data={movieData.data} />
-        <List heading="popular web series / TV" data={tvShowData.data} />
+        {upcomingMoviesData && upcomingMoviesData.results && (
+          <List heading="upcoming movies" data={upcomingMoviesData.results} />
+        )}
+        {movieData && movieData.results && (
+          <List heading="popular movies" data={movieData.results} />
+        )}
+        {tvShowData && tvShowData.results && (
+          <List heading="popular web series / TV" data={tvShowData.results} />
+        )}
       </Suspense>
     </div>
   );

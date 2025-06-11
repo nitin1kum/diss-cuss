@@ -1,8 +1,10 @@
+import UpdateLoader from "@/components/global/update-loader";
 import React from "react";
 
 const TermsAndConditions = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 leading-8 tracking-wider">
+      <UpdateLoader/>
       <h1 className="text-3xl font-bold mb-6 text-text">Terms and Conditions</h1>
       <p className="mb-4 text-subtext">Effective Date: 25 May 2025</p>
 

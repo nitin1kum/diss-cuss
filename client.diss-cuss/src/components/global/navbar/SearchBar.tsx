@@ -2,15 +2,18 @@
 
 import { SearchResponse, TmdbSearchResult } from "@/types/types";
 import { ChevronDown, Loader, Search, X } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import DefaultLink from "../default-link";
+import { useLoader } from "@/contexts/LoaderStateProvider";
+import { fetcher } from "@/utils/fetcher";
 
 const SearchBar = () => {
   const [isPending, setIsPending] = useState(false);
   const [showList, setShowList] = useState<boolean>(false);
   const router = useRouter();
-  const [showNav, setShowNav] = useState(false)
+  const context = useLoader();
+  const [showNav, setShowNav] = useState(false);
   const [showType, setShowType] = useState<boolean>(false);
   const [list, setList] = useState<TmdbSearchResult[] | null>(null);
   const [type, setType] = useState<"movie" | "tv">("movie");
@@ -30,17 +33,32 @@ const SearchBar = () => {
     setShowList(true);
     setShowNav(true);
     document.addEventListener("click", handleClick);
-    function handleClick(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setShowList(false);
-        setShowNav(false)
-        containerRef.current.value = "";
-        setList([]);
-        document.removeEventListener("click", handleClick);
-      }
+  }
+
+  function handleClick(event: MouseEvent) {
+    if (
+      containerRef.current &&
+      !containerRef.current.contains(event.target as Node)
+    ) {
+      setShowList(false);
+      setShowNav(false);
+      containerRef.current.value = "";
+      setList([]);
+      document.removeEventListener("click", handleClick);
+    }
+  }
+
+  async function fetchData() {
+    try {
+      const data = await fetcher(
+        `/api/collection/search?query=${value}&type=${type}&page=1&limit=10`
+      );
+
+      let { results } = data as SearchResponse;
+      results.forEach((item) => (item.media_type = type));
+      setList(results);
+    } catch (error) {
+      console.log("Error while fetching data - ", error);
     }
   }
 
@@ -49,18 +67,7 @@ const SearchBar = () => {
       setIsPending(false);
       return;
     }
-    try {
-      fetch(`/api/collection/search?q=${value}&t=${type}&page=1`).then(
-        async (res) => {
-          let data = (await res.json()) as SearchResponse;
-          let items = data.results;
-          items.forEach((item) => (item.media_type = type));
-          setList(items);
-        }
-      );
-    } catch (error) {
-      console.log("Error while fetching data - ", error);
-    }
+    fetchData();
   }, [value]);
 
   function handleOutsideChange() {
@@ -75,11 +82,23 @@ const SearchBar = () => {
     document.addEventListener("click", handleOutsideChange);
   };
 
-  const handleSubmit = (e : React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if(value === "") return;
-    router.push(`/search/${type}/${value}`)
-  }
+    if (value === "") return;
+    if (context) {
+      context.setShowLoader(true);
+      context.setProgress(20);
+    }
+    setShowList(false);
+    setShowNav(false);
+    if (containerRef.current) {
+      containerRef.current.value = "";
+      containerRef.current.blur();
+    }
+    setList([]);
+    document.removeEventListener("click", handleClick);
+    router.push(`/search/${type}/${value}`);
+  };
 
   useEffect(() => {
     setIsPending(false);
@@ -90,7 +109,11 @@ const SearchBar = () => {
       <button className="text-subtext" onClick={handleFocus}>
         <Search />
       </button>
-      <div className={`${showNav ? "flex" : "hidden"} sm:w-[300px] w-full absolute sm:bg-transparent bg-bg z-50 inset-0 top-0 sm:relative sm:flex items-center`}>
+      <div
+        className={`${
+          showNav ? "flex" : "hidden"
+        } sm:w-[300px] w-full absolute sm:bg-transparent bg-bg z-50 inset-0 top-0 sm:relative sm:flex items-center`}
+      >
         <div className="flex w-full ring-border-secondary rounded-full ring-[1px] overflow-hidden">
           <button
             onClick={handleTypeChange}
@@ -101,7 +124,10 @@ const SearchBar = () => {
             </span>
             <ChevronDown className="size-5" />
           </button>
-          <form onSubmit={handleSubmit} className="relative w-full flex justify-between">
+          <form
+            onSubmit={handleSubmit}
+            className="relative w-full flex justify-between"
+          >
             <input
               ref={containerRef}
               type="search"
@@ -146,7 +172,7 @@ const SearchBar = () => {
                 {list && list.length > 0 ? (
                   <>
                     {list.map((item, cnt) => (
-                      <Link
+                      <DefaultLink
                         href={`/discuss/${type}/${item.id}`}
                         key={item.id}
                         title={
@@ -169,7 +195,7 @@ const SearchBar = () => {
                             ? item.release_date
                             : item.first_air_date}
                         </span>
-                      </Link>
+                      </DefaultLink>
                     ))}
                   </>
                 ) : (

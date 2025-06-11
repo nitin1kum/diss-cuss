@@ -1,7 +1,7 @@
 import { TmdbSearchResult } from "@/types/types";
 import { Star } from "lucide-react";
-import Link from "next/link";
 import React from "react";
+import DefaultLink from "../default-link";
 
 type Props = {
   heading: string;
@@ -11,18 +11,18 @@ type Props = {
 const List = ({ heading, data }: Props) => {
   return (
     <div className="p-4 my-6">
-      <h3 className="text-text font-semibold capitalize text-2xl">{heading}</h3>
-      <div className="grid lg:grid-cols-5 gap-x-6 gap-y-12 sm:grid-cols-3 grid-cols-2 m-auto">
+      <h3 className="text-text font-semibold capitalize text-3xl mb-6">{heading}</h3>
+      <div className="grid xl:grid-cols-6 gap-x-6 gap-y-12 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 grid-cols-2 m-auto">
         {data.map((discuss) => {
           const name =
             discuss.media_type === "movie"
               ? discuss.title || discuss.original_title
               : discuss.name || discuss.original_name;
           return (
-            <Link
+            <DefaultLink
               href={`/discuss/${discuss.media_type}/${discuss.id}`}
               key={discuss.id}
-              className="rounded-md shadow-xl hover:shadow-2xl relative group"
+              className="rounded-md shadow-xl overflow-hidden hover:shadow-2xl relative group"
               title={name}
             >
               <img
@@ -54,11 +54,11 @@ const List = ({ heading, data }: Props) => {
                   </span>
                   <span className="flex gap-2 items-center">
                     <Star className="size-4 sm:size-5 fill-yellow-500 text-transparent" />{" "}
-                    {discuss.vote_average.toFixed(1) || 0} / 10
+                    {(discuss.vote_average && discuss.vote_average.toFixed(1)) || 0} / 10
                   </span>
                 </div>
               </div>
-            </Link>
+            </DefaultLink>
           );
         })}
       </div>

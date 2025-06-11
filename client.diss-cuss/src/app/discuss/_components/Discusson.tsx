@@ -3,16 +3,20 @@ import React, { RefObject, useEffect, useState } from "react";
 import { Loader, Plus } from "lucide-react";
 import useSWRInfinite from "swr/infinite";
 import { toast } from "react-toastify";
-
 import RichTextEditor from "@/components/global/text-editor";
 import Thread from "@/components/global/thread";
 import ThreadsSkelton from "./ThreadsSkelton";
 import { fetcher } from "@/utils/fetcher";
-import { DiscussionThreadResponse, ThreadProps } from "@/types/types";
+import {
+  CreatedThread,
+  DiscussionThreadResponse,
+  ThreadProps,
+} from "@/types/types";
 import { useLoader } from "@/contexts/LoaderStateProvider";
 import UpdateLoader from "@/components/global/update-loader";
+import { infiniteFetcher } from "@/utils/infiniteFetcher";
 
-const PAGE_LIMIT = 6;
+const PAGE_LIMIT = 10;
 
 export default function Discussion({
   discussion_id,
@@ -31,9 +35,9 @@ export default function Discussion({
     previousPageData: DiscussionThreadResponse | null
   ) => {
     // stop when no more data
-    if (previousPageData && pageIndex > previousPageData.totalPages - 1)
+    if (previousPageData && pageIndex > previousPageData.total_pages - 1)
       return null;
-    return `/api/collection/threads/${discussion_id}?page=${
+    return `/api/collection/threads/discussion/${discussion_id}?page=${
       pageIndex + 1
     }&limit=${PAGE_LIMIT}`;
   };
@@ -52,22 +56,27 @@ export default function Discussion({
       if (!discussion_id) return null;
       return getKey(pageIndex, previousPageData);
     },
-    fetcher
+    infiniteFetcher
   );
-
-  // 3) aggregate arrays
-  const threads = pages ? pages.flatMap((p) => p.data) : [];
-  const totalDiscussion = pages?.[0]?.threadCount ?? 0;
-  const totalPages = pages?.[0]?.totalPages || 1;
-  const isLoadingInitial = !pages && !error;
-  const isEmpty = pages?.[0]?.data.length === 0;
-  const isReachingEnd = size >= totalPages;
 
   if (error) {
     console.error("Error fetching threads:", error);
+
     toast.error("Oops! Some error occurred");
+    if (context) {
+      context.setProgress(100);
+      context.setShowLoader(false);
+    }
     return null;
   }
+
+  // 3) aggregate arrays
+  const threads = pages ? pages.flatMap((p) => p.data) : [];
+  const totalDiscussion = pages?.[0]?.total_threads ?? 0;
+  const totalPages = pages?.[0]?.total_pages || 1;
+  const isLoadingInitial = !pages && !error;
+  const isEmpty = pages?.[0]?.data.length === 0;
+  const isReachingEnd = size >= totalPages;
 
   if (isLoadingInitial) {
     return <ThreadsSkelton />;
@@ -86,23 +95,54 @@ export default function Discussion({
 
     setIsPending(true);
     try {
-      const res = await fetch(`/api/collection/post/thread`, {
+      const data = await fetcher(`/api/collection/threads/create/thread`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content, html, discussion_id }),
       });
-      if (!res.ok) throw new Error("Failed to post");
-      const { data: newThread } = await res.json();
 
       // Prepend to first page and revalidate
+      const { data: newThread, message } = data as {
+        message: string;
+        data: CreatedThread;
+      };
+
+      const thread: ThreadProps = {
+        user: newThread.user,
+        replies: [],
+        like_count: newThread._count.likes,
+        replies_count: 0,
+        liked: null,
+        id: newThread.id,
+        discussion_id: newThread.discussion_id,
+        content: newThread.content,
+        html: newThread.html,
+        depth: 0,
+        isReply: false,
+        createdAt: newThread.createdAt,
+      };
+
       await mutate((pages) => {
-        if (!pages) return pages;
+        if (!pages) {
+          return [
+            {
+              total_threads: 1,
+              message,
+              data: [thread],
+              total_pages: 1,
+              currentPage: 1,
+            },
+          ];
+        }
+
         const first = pages[0];
+
         return [
           {
             ...first,
-            data: [newThread, ...first.data],
-            threadCount: first.threadCount + 1,
+            data: [thread, ...first.data],
+            total_threads: first.total_threads + 1,
+            total_pages: Math.ceil((first.total_threads + 1) / PAGE_LIMIT),
           },
           ...pages.slice(1),
         ];
@@ -112,7 +152,7 @@ export default function Discussion({
       editor.current.getEditor().setText("");
       setShowEditor(false);
     } catch (err) {
-      console.error(err);
+      console.error("Error while posting thread - ", err);
       toast.error("Error while posting thread");
     } finally {
       setIsPending(false);
@@ -121,11 +161,10 @@ export default function Discussion({
 
   return (
     <div key={discussion_id}>
-      <UpdateLoader isLoading={isLoading}/>
       <h2 className="pt-16 text-text font-medium tracking-wide">
         Discussion{totalDiscussion > 0 && "s"} ({totalDiscussion})
       </h2>
-
+      <UpdateLoader isLoading={isLoading} />
       <div className="flex gap-2 mb-10 items-center justify-between">
         <h3 className="text-text m-0 font-medium tracking-wide">{name}</h3>
         <button
@@ -157,8 +196,8 @@ export default function Discussion({
             <Thread
               key={thread.id}
               thread={thread}
-              isLast={idx === threads.length - 1}
               level={1}
+              isLast={idx === threads.length - 1}
               hideParent={() => {
                 return true;
               }}

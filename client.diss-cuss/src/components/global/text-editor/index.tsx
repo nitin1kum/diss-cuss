@@ -1,11 +1,11 @@
 "use client";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import ReactQuill, { Quill } from "react-quill-new";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
 import "react-quill-new/dist/quill.snow.css";
 import ToolBar from "./ToolBar";
 import { Loader2 } from "lucide-react";
+import DefaultLink from "../default-link";
+import { useUser } from "@/contexts/AuthProvider";
 
 var formats = [
   "header",
@@ -38,7 +38,7 @@ const RichTextEditor: React.FC<Props> = ({
   handleSubmit,
   id,
 }) => {
-  const { data } = useSession();
+  const { user } = useUser();
   const [savedRange, setSavedRange] = useState<ReactQuill.Range | null>(null);
   const quillRef = useRef<ReactQuill | null>(null);
   const modules = {
@@ -61,15 +61,15 @@ const RichTextEditor: React.FC<Props> = ({
 
   return (
     <div className="text-editor border w-full min-w-72 sm:max-w-3xl border-border-secondary rounded-xl space-y-2 my-3">
-      {!data ? (
+      {!user ? (
         <div className="flex text-text items-center gap-3 justify-center py-10">
           Sign in to comment
-          <Link
+          <DefaultLink
             href={"/auth/sign-in"}
             className="flex w-fit gap-2 items-center text-text p-2 rounded-md bg-accent brightness-90 hover:brightness-100"
           >
             Sign In
-          </Link>
+          </DefaultLink>
         </div>
       ) : (
         <>
