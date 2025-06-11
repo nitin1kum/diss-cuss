@@ -1,0 +1,10 @@
+import { CorsOptions } from "cors";
+
+const whitelist = ["http://localhost:3000",`${process.env.NEXT_BASE_URL}`];
+
+export const corsOptions : CorsOptions = {
+  origin : whitelist,
+  methods : ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders : ['Content-Type','Authorization'],
+  credentials : true,
+}

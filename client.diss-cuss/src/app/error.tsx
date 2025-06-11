@@ -1,6 +1,5 @@
 "use client";
 
-import DefaultLink from "@/components/global/default-link";
 import UpdateLoader from "@/components/global/update-loader";
 import { useEffect } from "react";
 
@@ -12,7 +11,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("kak", error);
+    console.error("Error occurred while rendering page - ", error);
   }, [error]);
 
   return (

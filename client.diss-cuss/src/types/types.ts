@@ -45,50 +45,33 @@ export type SearchResponse = {
   page: number;
 };
 
-type TmdbMovieDetails = {
-  adult: boolean;
-  backdrop_path: string | null;
-  belongs_to_collection: {
-    id: number;
-    name: string;
-    poster_path: string | null;
-    backdrop_path: string | null;
-  } | null;
-  budget: number;
-  genres: { id: number; name: string }[];
-  homepage: string;
-  id: number;
-  imdb_id: string | null;
+export type TmdbMediaDetails = {
+  id: string;
+  name: string;
+  type: string;
+  poster_path: string;
+  imdb_id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  adult: Boolean;
+  backdrop_path?: string;
+  budget?: string;
+  homepage?: string;
   origin_country: string[];
-  original_language: string;
   original_title: string;
+  original_language: string;
+  popularity?: number;
   overview: string;
-  popularity: number;
-  poster_path: string | null;
-  production_companies: {
-    id: number;
-    logo_path: string | null;
-    name: string;
-    origin_country: string;
-  }[];
-  production_countries: {
-    iso_3166_1: string;
-    name: string;
-  }[];
+  threads: any[];
   release_date: string;
-  revenue: number;
-  runtime: number;
-  spoken_languages: {
-    english_name: string;
-    iso_639_1: string;
-    name: string;
-  }[];
-  status: string;
-  tagline: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
+  revenue?: string;
+  runtime?: string;
+  status?: string;
+  vote_average: string;
+  vote_count: string;
+
+  genres: TmdbGenre[];
+  production_companies: TmdbCompany[];
 };
 
 type TmdbGenre = {
@@ -103,137 +86,16 @@ type TmdbCompany = {
   origin_country: string;
 };
 
-type TmdbCountry = {
-  iso_3166_1: string;
-  name: string;
-};
-
-type TmdbLanguage = {
-  english_name: string;
-  iso_639_1: string;
-  name: string;
-};
-
-// Common base
-type TmdbBase = {
-  adult: boolean;
-  backdrop_path: string | null;
-  genres: TmdbGenre[];
-  homepage: string;
-  id: number;
-  origin_country: string[];
-  original_language: string;
-  overview: string;
-  popularity: number;
-  poster_path: string | null;
-  production_companies: TmdbCompany[];
-  production_countries: TmdbCountry[];
-  spoken_languages: TmdbLanguage[];
-  status: string;
-  tagline: string;
-  vote_average: number;
-  vote_count: number;
-};
-
-// Movie-specific
-type TmdbMovie = TmdbBase & {
-  media_type: "movie";
-  belongs_to_collection: {
-    id: number;
-    name: string;
-    poster_path: string | null;
-    backdrop_path: string | null;
-  } | null;
-  budget: number;
-  imdb_id: string;
-  original_title: string;
-  release_date: string;
-  revenue: number;
-  runtime: number;
-  title: string;
-  video: boolean;
-};
-
-// TV-specific
-type TmdbTv = TmdbBase & {
-  media_type: "tv";
-  created_by: any[];
-  episode_run_time: number[];
-  first_air_date: string;
-  in_production: boolean;
-  last_air_date: string;
-  last_episode_to_air: {
-    id: number;
-    name: string;
-    overview: string;
-    vote_average: number;
-    vote_count: number;
-    air_date: string;
-    episode_number: number;
-    episode_type: string;
-    production_code: string;
-    runtime: number;
-    season_number: number;
-    show_id: number;
-    still_path: string | null;
-  } | null;
-  name: string;
-  next_episode_to_air: any | null;
-  networks: TmdbCompany[];
-  number_of_episodes: number;
-  number_of_seasons: number;
-  original_name: string;
-  seasons: {
-    air_date: string;
-    episode_count: number;
-    id: number;
-    name: string;
-    overview: string;
-    poster_path: string | null;
-    season_number: number;
-    vote_average: number;
-  }[];
-  type: string;
-};
-
-// Union Type
-export type TmdbMediaDetails = TmdbMovie | TmdbTv;
-
 export type DetailsResponse = {
   data: TmdbMediaDetails;
-  discussion_id: string;
   message: string;
-  jsonLd : any;
+  jsonLd: any;
 };
 
 export type DiscussionThreadResponse = {
-  data: ({
-    user: {
-      username: string;
-      image: string;
-    };
-    replies: {
-      id: string;
-    }[];
-    _count: {
-      likes: number;
-    };
-    likes: {
-      liked: boolean;
-    }[];
-  } & {
-    id: string;
-    discussion_id: string;
-    user_id: string;
-    content: string;
-    html: string;
-    isReply: boolean;
-    parent_id: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-  })[];
-  threadCount: number;
-  totalPages: number;
+  data: ThreadProps[];
+  total_threads: number;
+  total_pages: number;
   currentPage: number;
   message: string;
 };
@@ -243,47 +105,76 @@ export type ThreadProps = {
     username: string;
     image: string;
   };
-  replies: {
-    id: string;
-  }[];
-  _count: {
-    likes: number;
-  };
-  likes?: {
-    liked: boolean;
-  }[];
-} & {
+  replies: ThreadProps[];
+  like_count: number;
+  replies_count: number;
+  liked?: boolean | null;
   id: string;
   discussion_id: string;
-  user_id: string;
   content: string;
   html: string;
+  depth: number;
   isReply: boolean;
-  parent_id: string | null;
   createdAt: Date;
-  updatedAt: Date;
 };
 
 // Final response type
 export type ThreadResponse = {
-  thread: ThreadProps[];
+  data: ThreadProps[];
+  total_threads: number;
+  total_pages: number;
+  currentPage: number;
   message: string;
 };
 
 export type Sitemap = Array<{
-  url: string
-  lastModified?: string | Date
+  url: string;
+  lastModified?: string | Date;
   changeFrequency?:
-    | 'always'
-    | 'hourly'
-    | 'daily'
-    | 'weekly'
-    | 'monthly'
-    | 'yearly'
-    | 'never'
-  priority?: number
+    | "always"
+    | "hourly"
+    | "daily"
+    | "weekly"
+    | "monthly"
+    | "yearly"
+    | "never";
+  priority?: number;
   alternates?: {
-    languages?: Languages<string>
-  },
-  images? : string[]
-}>
+    languages?: Languages<string>;
+  };
+  images?: string[];
+}>;
+
+export type CreatedThread = {
+  user: {
+    username: string;
+    image: string;
+  };
+  replies: {
+    id: string;
+  }[];
+  likes: {
+    liked: boolean;
+  }[];
+  _count: {
+    likes: number;
+  };
+} & {
+  content: string;
+  html: string;
+  discussion_id: string;
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user_id: string;
+  isReply: boolean;
+  parent_id: string | null;
+};
+
+export type User = {
+  id: string;
+  username: string;
+  email: string;
+  emailVerified?: string | Date | null;
+  image?: string | null;
+};

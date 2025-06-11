@@ -1,12 +1,13 @@
-import { prisma } from "@/lib/prisma";
 import { Sitemap } from "@/types/types";
+import { fetcher } from "@/utils/fetcher";
 import { MetadataRoute } from "next";
 
-export const revalidate = 60
+export const revalidate = 60;
 
 export async function generateSitemaps() {
-  const discussions = await prisma.discussion.count();
-  const length = (discussions + 44999) / 45000;
+  const discussions = await fetcher("/api/sitemap/count");
+  const { discussions_count } = discussions as { discussions_count: number };
+  const length = Math.ceil(discussions_count / 45000);
   const sitemaps: { id: number }[] = [];
   Array([{ length }]).map((_, id) => {
     sitemaps.push({ id });
@@ -14,14 +15,14 @@ export async function generateSitemaps() {
   return sitemaps;
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap({id} : {id : number}): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXTBASE_URL || "http://localhost:3000";
-
   // Fetch all discussion slugs (imdb_ids)
-  const discussions = await prisma.discussion.findMany({
-    select: { imdb_id: true, type: true, poster: true },
-  });
-
+  const discussions = await fetcher(`/api/sitemap/urls?page=${id + 1}&limit=${45000}`);
+  console.log(discussions)
+  const { discussion_urls } = discussions as {
+    discussion_urls: { url: string; poster: string }[];
+  };
   const routes: Sitemap = [];
 
   ["", "privacy-policy", "terms"].forEach((path) => {
@@ -33,19 +34,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  discussions.forEach((discussion) => {
+  discussion_urls.forEach((url) => {
     routes.push({
-      url: `${baseUrl}/discuss/${discussion.type}/${discussion.imdb_id}`,
+      url: url.url,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
-      images: [
-        `${
-          discussion.poster.length > 0
-            ? "https://image.tmdb.org/t/p/w1280/" + discussion.poster
-            : baseUrl + "/default_poster.png"
-        }`,
-      ],
+      images: [`${url.poster}`],
     });
   });
 

@@ -7,29 +7,23 @@ const MovieHero = ({ media }: { media: TmdbMediaDetails }) => {
   return (
     <div className="py-2 relative z-10 text-text">
       {/* Meta Data */}
-      <h1 className="font-medium m-0">
-        {media.media_type === "movie" ? media.title : media.name}
-      </h1>
-      <p className="my-1 text-subtext">
-        {media.media_type === "tv" ? media.original_name : media.original_title}
-      </p>
+      <h1 className="font-medium m-0">{media.name}</h1>
+      <p className="my-1 text-subtext">{media.original_title}</p>
       <div className="flex gap-2 text-subtext">
-        <span>
-          {media.media_type === "movie"
-            ? media.release_date
-            : media.first_air_date}
-        </span>
+        <span>{media.release_date}</span>
         <span>•</span>
-        <span>{media.adult || "not rated"}</span>
+        <span>{media.adult ? "adult" : "not rated"}</span>
         <span>•</span>
-        <span>
-          {media.media_type === "movie" && calculateRunTime(media.runtime!)}
-        </span>
+        {media.runtime && <span>{calculateRunTime(parseInt(media.runtime,10))}</span>}
       </div>
       {/* Poster */}
       <div>
         <Image
-          src={media.poster_path ? "https://image.tmdb.org/t/p/w1280/" + media.poster_path : "/default_poster.png"}
+          src={
+            media.poster_path
+              ? "https://image.tmdb.org/t/p/w1280/" + media.poster_path
+              : "/default_poster.png"
+          }
           alt="media poster"
           width={300}
           height={300}

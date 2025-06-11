@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import DefaultLink from "../default-link";
 import { useLoader } from "@/contexts/LoaderStateProvider";
+import { fetcher } from "@/utils/fetcher";
 
 const SearchBar = () => {
   const [isPending, setIsPending] = useState(false);
@@ -47,23 +48,26 @@ const SearchBar = () => {
     }
   }
 
+  async function fetchData() {
+    try {
+      const data = await fetcher(
+        `/api/collection/search?query=${value}&type=${type}&page=1&limit=10`
+      );
+
+      let { results } = data as SearchResponse;
+      results.forEach((item) => (item.media_type = type));
+      setList(results);
+    } catch (error) {
+      console.log("Error while fetching data - ", error);
+    }
+  }
+
   useEffect(() => {
     if (value === "") {
       setIsPending(false);
       return;
     }
-    try {
-      fetch(`/api/collection/search?q=${value}&t=${type}&page=1`).then(
-        async (res) => {
-          let data = (await res.json()) as SearchResponse;
-          let items = data.results;
-          items.forEach((item) => (item.media_type = type));
-          setList(items);
-        }
-      );
-    } catch (error) {
-      console.log("Error while fetching data - ", error);
-    }
+    fetchData();
   }, [value]);
 
   function handleOutsideChange() {

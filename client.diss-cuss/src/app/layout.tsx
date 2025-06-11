@@ -6,7 +6,7 @@ import Navbar from "@/components/global/navbar";
 import { ToastContainer } from "react-toastify";
 import Footer from "@/components/global/footer";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import AuthProvider from "@/contexts/SessionProvider";
+import AuthProvider from "@/contexts/AuthProvider";
 import RouteLoader from "@/components/global/route-loader";
 import LoaderProvider from "@/contexts/LoaderStateProvider";
 

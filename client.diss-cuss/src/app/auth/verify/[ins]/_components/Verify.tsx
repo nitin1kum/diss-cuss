@@ -1,15 +1,14 @@
 "use client"
 import DefaultLink from "@/components/global/default-link";
 import UpdateLoader from "@/components/global/update-loader";
+import { useUser } from "@/contexts/AuthProvider";
 import { useLoader } from "@/contexts/LoaderStateProvider";
 import { Loader } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Verify = ({instruction} : {instruction : string}) => {
-  const { data } = useSession();
+  const { user } = useUser();
   const context = useLoader();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -26,7 +25,7 @@ const Verify = ({instruction} : {instruction : string}) => {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  if (data && data.user) {
+  if (user) {
     if(context){
       context.setProgress(20);
       context.setShowLoader(true)

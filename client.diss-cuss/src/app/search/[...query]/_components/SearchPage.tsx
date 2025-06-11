@@ -10,6 +10,7 @@ import List from "@/components/global/list";
 import { Loader } from "lucide-react";
 import UpdateLoader from "@/components/global/update-loader";
 import { useLoader } from "@/contexts/LoaderStateProvider";
+import { infiniteFetcher } from "@/utils/infiniteFetcher";
 
 type Props = {
   type: "movie" | "tv";
@@ -22,9 +23,9 @@ const SearchPage = ({ type, name }: Props) => {
   const context = useLoader();
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.results.length) return null; // end
-    return `/api/collection/search?q=${encodeURIComponent(
+    return `/api/collection/search?query=${encodeURIComponent(
       name
-    )}&t=${type}&page=${pageIndex + 1}`;
+    )}&type=${type}&page=${pageIndex + 1}&limit=${PAGE_SIZE}`;
   };
 
   const { data, error, size, setSize, isValidating, isLoading } =
@@ -32,7 +33,7 @@ const SearchPage = ({ type, name }: Props) => {
       (pageIndex: number, previousPageData: SearchResponse | null) => {
         return getKey(pageIndex, previousPageData);
       },
-      fetcher
+      infiniteFetcher
     );
 
   if (error) {
@@ -40,8 +41,7 @@ const SearchPage = ({ type, name }: Props) => {
       context.setProgress(100);
       context.setShowLoader(false);
     }
-    console.log("error while fetching data - ", error);
-
+    console.log("Error while fetching data - ", error);
     toast.error("Oops! Some error occurred.");
     return <SearchSkelton />;
   }
@@ -50,7 +50,7 @@ const SearchPage = ({ type, name }: Props) => {
   items.forEach((item) => (item.media_type = type));
 
   const isReachingEnd =
-    data && data[data.length - 1]?.results?.length < PAGE_SIZE;
+    data && data[data.length - 1]?.total_pages <= data[data.length - 1]?.page;
 
   return isLoading ? (
     <SearchSkelton />

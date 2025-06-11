@@ -4,20 +4,19 @@ import React, { Suspense } from "react";
 import HomeSkelton from "./_components/HomeSkelton";
 import { toast } from "react-toastify";
 import UpdateLoader from "@/components/global/update-loader";
-import { TmdbSearchResult } from "@/types/types";
 
 const Home = async () => {
   const moviePromise = fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/popular/movies`,
-    { next: { revalidate: 60 * 60 * 24 } }
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/popular/movies?page=1&limit=10`,
+    { next: { revalidate: 60*60*24 } }
   );
   const tvShowPromise = fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/popular/tv`,
-    { next: { revalidate: 60 * 60 * 24 } }
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/popular/tv?page=1&limit=10`,
+    { next: { revalidate: 60*60*24 } }
   );
   const upcomingMovies = fetch(
-    `${process.env.NEXTBASE_URL}/api/collection/upcoming`,
-    { next: { revalidate: 60 * 60 * 24 } }
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/upcoming/movies?page=1&limit=10`,
+    { next: { revalidate: 60*60*24 } }
   );
 
   const [movieRes, tvShowRes, upcomingMoviesRes] = await Promise.all([
@@ -44,14 +43,14 @@ const Home = async () => {
         <h2 className="pt-4 text-center text-4xl w-full text-text">
           Diss-Cuss
         </h2>
-        {upcomingMoviesData && upcomingMoviesData.data && (
-          <List heading="upcoming movies" data={upcomingMoviesData.data} />
+        {upcomingMoviesData && upcomingMoviesData.results && (
+          <List heading="upcoming movies" data={upcomingMoviesData.results} />
         )}
-        {movieData && movieData.data && (
-          <List heading="popular movies" data={movieData.data} />
+        {movieData && movieData.results && (
+          <List heading="popular movies" data={movieData.results} />
         )}
-        {tvShowData && tvShowData.data && (
-          <List heading="popular web series / TV" data={tvShowData.data} />
+        {tvShowData && tvShowData.results && (
+          <List heading="popular web series / TV" data={tvShowData.results} />
         )}
       </Suspense>
     </div>
