@@ -10,7 +10,7 @@ services:
     env_file:
       - ./server.diss-cuss/.env.production
     environment:
-      BACKEND_BASE_URL: "http://server:5000"
+      BACKEND_BASE_URL: "https://diss-cuss.duckdns.org"
       NEXT_BASE_URL: "https://diss-cuss.vercel.app"
     volumes:
       - ./server.diss-cuss:/app
