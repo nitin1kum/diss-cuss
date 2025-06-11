@@ -45,7 +45,7 @@ export async function generateJsonLd(discussion_id: string) {
           "@type": "DiscussionForum",
           name: `${mainThread.discussion.name} – Popular Threads`,
           url: `${process.env.NEXTBASE_URL}/discussion/${mainThread.discussion.imdb_id}`,
-          discussionForumPosting: popularThreads.map((t) => ({
+          discussionForumPosting: popularThreads.map((t : any) => ({
             "@type": "DiscussionForumPosting",
             headline: `${t.user.username}'s thread snippet`,
             articleBody: t.content.slice(0, 80),

@@ -31,7 +31,7 @@ export const getUrls = async (
     });
 
     const urls: { url: string; poster: string }[] = [];
-    discussions.forEach((url) => {
+    discussions.forEach((url : any) => {
       urls.push({
         url: `${process.env.NEXT_BASE_URL}/discuss/${url.type}/${url.imdb_id}`,
         poster:

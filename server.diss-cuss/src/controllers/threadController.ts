@@ -6,6 +6,7 @@ import {
   AuthenticatedRequest,
   Thread,
   ThreadMap,
+  ThreadResponse,
   ThreadResult,
 } from "../types/types";
 import {
@@ -64,15 +65,15 @@ export const getDiscussionThreads = async (
     const offset = (page - 1) * limit;
 
     // 2. Get paginated top‐level threads
-    const topThreads = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
+    const topThreads = await prisma.$queryRawUnsafe(
       topThreadQuery,
       discussion_id,
       user_id,
       limit,
       offset
-    );
+    ) as Array<{ id: string }>;
 
-    const topIds = topThreads.map((t) => t.id);
+    const topIds = topThreads.map((t : {id : string}) => t.id);
     const total_threads = await prisma.thread.count({
       where: { discussion_id, isReply: false },
     });
@@ -89,14 +90,14 @@ export const getDiscussionThreads = async (
     }
 
     // 3. Recursive CTE: fetch all descendants of those topIds
-    const rawRows = await prisma.$queryRawUnsafe<ThreadResult>(
+    const rawRows = await prisma.$queryRawUnsafe(
       threadTreeQuery(3),
       topIds,
       user_id,
-    );
+    ) as ThreadResult;
 
     const nodeMap: Record<string, ThreadMap> = {};
-    rawRows.forEach((row) => {
+    rawRows.forEach((row : ThreadResponse) => {
       nodeMap[row.id] = {
         id: row.id,
         content: row.content,
@@ -117,7 +118,7 @@ export const getDiscussionThreads = async (
     });
 
     const roots: Thread[] = [];
-    rawRows.forEach((row) => {
+    rawRows.forEach((row : ThreadResponse) => {
       const node = nodeMap[row.id];
       if (row.parent_id && nodeMap[row.parent_id]) {
         nodeMap[row.parent_id].replies.push(node);
@@ -161,15 +162,15 @@ export const getThread = async (
     const offset = (page - 1) * limit;
 
     // 2. Get paginated top‐level threads
-    const topThreads = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
+    const topThreads = await prisma.$queryRawUnsafe(
       topReplyQuery,
       thread_id,
       user_id,
       limit,
       offset
-    );
+    ) as Array<{ id: string }>;
 
-    const topIds = topThreads.map((t) => t.id);
+    const topIds = topThreads.map((t : {id : string}) => t.id);
     const total_threads =
       (await prisma.thread.count({
         where: { parent_id: thread_id },
@@ -188,14 +189,14 @@ export const getThread = async (
     }
 
     // 3. Recursive CTE: fetch all descendants of those topIds
-    const rawRows = await prisma.$queryRawUnsafe<ThreadResult>(
+    const rawRows = await prisma.$queryRawUnsafe(
       threadTreeQuery(2),
       topIds,
       user_id
-    );
+    ) as ThreadResult;
 
     const nodeMap: Record<string, ThreadMap> = {};
-    rawRows.forEach((row) => {
+    rawRows.forEach((row : ThreadResponse) => {
       nodeMap[row.id] = {
         id: row.id,
         content: row.content,
@@ -216,7 +217,7 @@ export const getThread = async (
     });
 
     const roots: Thread[] = [];
-    rawRows.forEach((row) => {
+    rawRows.forEach((row : ThreadResponse) => {
       const node = nodeMap[row.id];
       if (row.parent_id && nodeMap[row.parent_id]) {
         nodeMap[row.parent_id].replies.push(node);

@@ -27,3 +27,5 @@ logs
 *.sublime-workspace
 *.sublime-project
 /src/generated/prisma
+
+dist/
