@@ -13,7 +13,6 @@ services:
       BACKEND_BASE_URL: "https://diss-cuss.duckdns.org"
       NEXT_BASE_URL: "https://diss-cuss.vercel.app"
     volumes:
-      - ./server.diss-cuss:/app
       - /app/node_modules
 
   db:
