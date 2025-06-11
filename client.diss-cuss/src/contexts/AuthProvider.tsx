@@ -1,8 +1,7 @@
 "use client";
 
-import { logoutUser } from "@/action/auth";
+import { User } from "@/types/types";
 import { fetcher } from "@/utils/fetcher";
-import { User } from "@prisma/client";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type UserContextType = {
@@ -23,19 +22,20 @@ export default function UserProvider({
   const [loading, setLoading] = useState(true);
 
   const logout = () => {
-    setLoading(true)
-    fetcher("/api/auth/logout",{
-      method : "POST",
-      headers : {
-        "Content-Type" : "application/json"
-      }
+    setLoading(true);
+    fetcher("/api/auth/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
       .then((res) => {
         setUser(null);
       })
       .catch((err) => {
         console.log(err);
-      }).finally(() => setLoading(false));
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {

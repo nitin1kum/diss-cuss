@@ -178,3 +178,4 @@ export type User = {
   emailVerified?: string | Date | null;
   image?: string | null;
 };
+
