@@ -21,7 +21,7 @@ RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/.env ./
+COPY --from=builder /app/.env.production ./
 
 EXPOSE 5000
 
