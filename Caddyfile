@@ -1,0 +1,3 @@
+diss-cuss.duckdns.org {
+  reverse_proxy server:5000
+}

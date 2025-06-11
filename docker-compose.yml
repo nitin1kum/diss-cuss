@@ -1,16 +1,16 @@
+version: "3.8"
+
 services:
   server:
     build: ./server.diss-cuss
     ports:
-      - "5000:5000"
+      - "5000"
     depends_on:
       - db
     env_file:
       - ./server.diss-cuss/.env.production
     environment:
-      DATABASE_URL: "postgresql://postgres:nitinrana1234@db:5432/diss_cuss"
-      PORT: 5000
-      BACKEND_BASE_URL: "http://server:5000"
+      BACKEND_BASE_URL: "https://diss-cuss.duckdns.org"
       NEXT_BASE_URL: "https://diss-cuss.vercel.app"
     volumes:
       - ./server.diss-cuss:/app
@@ -28,5 +28,20 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  caddy:
+    image: caddy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - server
+    restart: always
+
 volumes:
   db-data:
+  caddy_data:
+  caddy_config:
