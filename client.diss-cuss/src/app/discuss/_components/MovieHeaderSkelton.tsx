@@ -3,6 +3,7 @@
 import Skeleton from "@/components/global/skelton";
 import React from "react";
 import ThreadsSkelton from "./ThreadsSkelton";
+import UpdateLoader from "@/components/global/update-loader";
 
 const MovieHeaderSkelton = () => {
   return (
@@ -37,6 +38,7 @@ export const DiscussSkeleton = () => {
   return (
     <div className="container px-6 lg:max-w-7xl m-auto py-6">
       <MovieHeaderSkelton/>
+      <UpdateLoader/>
       <ThreadsSkelton/>
     </div>
   )

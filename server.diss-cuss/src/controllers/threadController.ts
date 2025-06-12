@@ -18,6 +18,7 @@ import {
 } from "../schemas/thread.schema";
 import { paginationSchema } from "../schemas/pagination.schema";
 import { threadTreeQuery, topReplyQuery, topThreadQuery } from "../utils/threadTreeQuery";
+import { logger } from "../utils/logger";
 
 interface reqParamsDisscussion {
   discussion_id: string;
@@ -48,6 +49,7 @@ export const getDiscussionThreads = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Discussion thread endpoint hit")
     const user_id = req.user?.id || "";
     // 1. Validate request params + query
     const parsedParams = discussionThreadSchema.safeParse(req.params);
@@ -145,6 +147,7 @@ export const getThread = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Thread endpoint hit")
     const parsedParams = threadSchema.safeParse(req.params);
     const parsedQuery = paginationSchema.safeParse(req.query);
     const user_id = req.user?.id || "";
@@ -244,6 +247,7 @@ export const likeThread = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Thread like endpoint hit")
     const user = req.user;
     if (!user) {
       return res.status(401).json("User not authorized");
@@ -311,6 +315,7 @@ export const createThread = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Create thread endpoint hit")
     const user = req.user;
     if (!user) {
       res.status(401).json("User not authorized");
@@ -380,6 +385,7 @@ export const createReply = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Create reply endpoint hit")
     const user = req.user;
     if (!user) {
       res.status(401).json("User not authorized");

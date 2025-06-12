@@ -8,10 +8,11 @@ import {
 } from "@prisma/client/runtime/library";
 
 import { ZodError } from "zod";
+import { logger } from "./logger";
 
 export function handleError(error: unknown, message: string): string {
   if (isAxiosError(error)) {
-    console.error(message, "AxiosError:", {
+    logger.error(message, "AxiosError:", {
       status: error.response?.status,
       message: error.message,
       stack: error.stack,
@@ -21,7 +22,7 @@ export function handleError(error: unknown, message: string): string {
   }
 
   if (error instanceof PrismaClientKnownRequestError) {
-    console.error(message, "Prisma Known Request Error:", {
+    logger.error(message, "Prisma Known Request Error:", {
       code: error.code,
       message: error.message,
       stack: error.stack,
@@ -31,32 +32,32 @@ export function handleError(error: unknown, message: string): string {
   }
 
   if (error instanceof PrismaClientUnknownRequestError) {
-    console.error(message, "Prisma Unknown Request Error:", error);
+    logger.error(message, "Prisma Unknown Request Error:", error);
     return "Unknown database error occurred.";
   }
 
   if (error instanceof PrismaClientValidationError) {
-    console.error(message, "Prisma Validation Error:", error);
+    logger.error(message, "Prisma Validation Error:", error);
     return "Database validation error: Check input data.";
   }
 
   if (error instanceof PrismaClientInitializationError) {
-    console.error(message, "Prisma Initialization Error:", error);
+    logger.error(message, "Prisma Initialization Error:", error);
     return "Database initialization failed.";
   }
 
   if (error instanceof PrismaClientRustPanicError) {
-    console.error(message, "Prisma Rust Panic Error:", error);
+    logger.error(message, "Prisma Rust Panic Error:", error);
     return "Critical database error occurred.";
   }
 
   if (error instanceof ZodError) {
-    console.error(message, "Zod Validation Error:", error.flatten());
+    logger.error(message, "Zod Validation Error:", error.flatten());
     return "Validation error: Invalid input format.";
   }
 
   if (error instanceof Error) {
-    console.error(message, "Generic Error:", {
+    logger.error(message, "Generic Error:", {
       name: error.name,
       message: error.message,
       stack: error.stack,
@@ -65,6 +66,6 @@ export function handleError(error: unknown, message: string): string {
     return `Unexpected error: ${error.message}`;
   }
 
-  console.error(message, "Unknown error type:", error);
+  logger.error(message, "Unknown error type:", error);
   return "An unknown error occurred.";
 }

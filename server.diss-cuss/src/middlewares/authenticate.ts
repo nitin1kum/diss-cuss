@@ -5,12 +5,14 @@ import { handleError } from "../utils/handleError";
 import { cookieConfig } from "../controllers/authController";
 import { prisma } from "../lib/prisma";
 import { generateTokens } from "../utils/generateTokens";
+import { logger } from "../utils/logger";
 
 export const authenticate = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) : Promise<any> => {
+  logger.info("Authentication started")
   const accessToken = req.signedCookies?.accessToken;
   const refreshToken = req.signedCookies?.refreshToken;
 
@@ -59,6 +61,7 @@ export const authenticate = async (
           res.clearCookie("accessToken", cookieConfig());
           res.clearCookie("refreshToken", cookieConfig());
 
+          logger.warn("Token reuse detected");
           return res
             .status(401)
             .json({ error: "Token reuse detected. Logged out for safety." });
