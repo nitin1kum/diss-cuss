@@ -8,6 +8,8 @@ import {
   ThreadMap,
   ThreadResponse,
   ThreadResult,
+  TmdbMediaDetails,
+  TmdbMovie,
 } from "../types/types";
 import {
   CreateReplySchema,
@@ -17,8 +19,15 @@ import {
   UpdateLikeSchema,
 } from "../schemas/thread.schema";
 import { paginationSchema } from "../schemas/pagination.schema";
-import { threadTreeQuery, topReplyQuery, topThreadQuery } from "../utils/threadTreeQuery";
+import {
+  threadTreeQuery,
+  topReplyQuery,
+  topThreadQuery,
+} from "../utils/threadTreeQuery";
 import { logger } from "../utils/logger";
+import { axiosTmdbInstance } from "../utils/axiosInstance";
+import { faker } from "@faker-js/faker";
+import { generateMovieComments } from "../utils/generateOpinion";
 
 interface reqParamsDisscussion {
   discussion_id: string;
@@ -44,12 +53,15 @@ interface reqBodyThread {
   discussion_id: string;
 }
 
+const MAX_USERS = 10;
+const MAX_THREADS_PER_USER = 2;
+
 export const getDiscussionThreads = async (
-  req: AuthenticatedRequest<reqParamsDisscussion,any,any>,
+  req: AuthenticatedRequest<reqParamsDisscussion, any, any>,
   res: Response
 ): Promise<any> => {
   try {
-    logger.info("Discussion thread endpoint hit")
+    logger.info("Discussion thread endpoint hit");
     const user_id = req.user?.id || "";
     // 1. Validate request params + query
     const parsedParams = discussionThreadSchema.safeParse(req.params);
@@ -67,15 +79,15 @@ export const getDiscussionThreads = async (
     const offset = (page - 1) * limit;
 
     // 2. Get paginated top‐level threads
-    const topThreads = await prisma.$queryRawUnsafe(
+    const topThreads = (await prisma.$queryRawUnsafe(
       topThreadQuery,
       discussion_id,
       user_id,
       limit,
       offset
-    ) as Array<{ id: string }>;
+    )) as Array<{ id: string }>;
 
-    const topIds = topThreads.map((t : {id : string}) => t.id);
+    const topIds = topThreads.map((t: { id: string }) => t.id);
     const total_threads = await prisma.thread.count({
       where: { discussion_id, isReply: false },
     });
@@ -92,14 +104,14 @@ export const getDiscussionThreads = async (
     }
 
     // 3. Recursive CTE: fetch all descendants of those topIds
-    const rawRows = await prisma.$queryRawUnsafe(
+    const rawRows = (await prisma.$queryRawUnsafe(
       threadTreeQuery(3),
       topIds,
-      user_id,
-    ) as ThreadResult;
+      user_id
+    )) as ThreadResult;
 
     const nodeMap: Record<string, ThreadMap> = {};
-    rawRows.forEach((row : ThreadResponse) => {
+    rawRows.forEach((row: ThreadResponse) => {
       nodeMap[row.id] = {
         id: row.id,
         content: row.content,
@@ -112,15 +124,15 @@ export const getDiscussionThreads = async (
         like_count: Number(row.like_count),
         replies_count: Number(row.replies_count),
         depth: row.depth,
-        isReply : row.isReply,
-        discussion_id : row.discussion_id,
-        liked : row.liked,
+        isReply: row.isReply,
+        discussion_id: row.discussion_id,
+        liked: row.liked,
         replies: [] as ThreadMap[],
       };
     });
 
     const roots: Thread[] = [];
-    rawRows.forEach((row : ThreadResponse) => {
+    rawRows.forEach((row: ThreadResponse) => {
       const node = nodeMap[row.id];
       if (row.parent_id && nodeMap[row.parent_id]) {
         nodeMap[row.parent_id].replies.push(node);
@@ -147,7 +159,7 @@ export const getThread = async (
   res: Response
 ): Promise<any> => {
   try {
-    logger.info("Thread endpoint hit")
+    logger.info("Thread endpoint hit");
     const parsedParams = threadSchema.safeParse(req.params);
     const parsedQuery = paginationSchema.safeParse(req.query);
     const user_id = req.user?.id || "";
@@ -161,23 +173,22 @@ export const getThread = async (
     const { thread_id } = parsedParams.data;
 
     let { page, limit } = parsedQuery.data;
-    limit = Math.min(limit,3);
+    limit = Math.min(limit, 3);
     const offset = (page - 1) * limit;
 
     // 2. Get paginated top‐level threads
-    const topThreads = await prisma.$queryRawUnsafe(
+    const topThreads = (await prisma.$queryRawUnsafe(
       topReplyQuery,
       thread_id,
       user_id,
       limit,
       offset
-    ) as Array<{ id: string }>;
+    )) as Array<{ id: string }>;
 
-    const topIds = topThreads.map((t : {id : string}) => t.id);
-    const total_threads =
-      (await prisma.thread.count({
-        where: { parent_id: thread_id },
-      }));
+    const topIds = topThreads.map((t: { id: string }) => t.id);
+    const total_threads = await prisma.thread.count({
+      where: { parent_id: thread_id },
+    });
 
     const total_pages = Math.ceil(total_threads / limit);
 
@@ -192,21 +203,21 @@ export const getThread = async (
     }
 
     // 3. Recursive CTE: fetch all descendants of those topIds
-    const rawRows = await prisma.$queryRawUnsafe(
+    const rawRows = (await prisma.$queryRawUnsafe(
       threadTreeQuery(2),
       topIds,
       user_id
-    ) as ThreadResult;
+    )) as ThreadResult;
 
     const nodeMap: Record<string, ThreadMap> = {};
-    rawRows.forEach((row : ThreadResponse) => {
+    rawRows.forEach((row: ThreadResponse) => {
       nodeMap[row.id] = {
         id: row.id,
         content: row.content,
         html: row.html,
-        isReply : row.isReply,
-        discussion_id : row.discussion_id,
-        liked : row.liked,
+        isReply: row.isReply,
+        discussion_id: row.discussion_id,
+        liked: row.liked,
         createdAt: row.createdAt,
         user: {
           username: row.username,
@@ -220,7 +231,7 @@ export const getThread = async (
     });
 
     const roots: Thread[] = [];
-    rawRows.forEach((row : ThreadResponse) => {
+    rawRows.forEach((row: ThreadResponse) => {
       const node = nodeMap[row.id];
       if (row.parent_id && nodeMap[row.parent_id]) {
         nodeMap[row.parent_id].replies.push(node);
@@ -247,7 +258,7 @@ export const likeThread = async (
   res: Response
 ): Promise<any> => {
   try {
-    logger.info("Thread like endpoint hit")
+    logger.info("Thread like endpoint hit");
     const user = req.user;
     if (!user) {
       return res.status(401).json("User not authorized");
@@ -315,7 +326,7 @@ export const createThread = async (
   res: Response
 ): Promise<any> => {
   try {
-    logger.info("Create thread endpoint hit")
+    logger.info("Create thread endpoint hit");
     const user = req.user;
     if (!user) {
       res.status(401).json("User not authorized");
@@ -385,7 +396,7 @@ export const createReply = async (
   res: Response
 ): Promise<any> => {
   try {
-    logger.info("Create reply endpoint hit")
+    logger.info("Create reply endpoint hit");
     const user = req.user;
     if (!user) {
       res.status(401).json("User not authorized");
@@ -448,6 +459,155 @@ export const createReply = async (
     res.status(400).json({ message: "Unknown error occurred" });
   } catch (error) {
     const message = handleError(error, "Error while updating like - ");
+    res.status(500).json({ message });
+  }
+};
+
+export const threadFaker = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> => {
+  try {
+    logger.info("faker endpoint hit");
+
+    // Fetch trending movies and TV shows
+    const [movieRes, tvRes] = await Promise.all([
+      axiosTmdbInstance(
+        `https://api.themoviedb.org/3/trending/movie/day?sort_by=popularity.desc`
+      ),
+      axiosTmdbInstance(
+        `https://api.themoviedb.org/3/trending/tv/day?sort_by=popularity.desc`
+      ),
+    ]);
+
+    const allMedia = [...movieRes.data.results, ...tvRes.data.results]; // limit to 10 items
+
+    await Promise.all(
+      allMedia.map(async (mediaInfo: TmdbMediaDetails) => {
+        const imdb_id = String(mediaInfo.id);
+        const type = mediaInfo.media_type || "movie";
+
+        let details = await prisma.discussion.findUnique({
+          where: { imdb_id_type: { imdb_id, type } },
+          include: {
+            _count: { select: { threads: true } },
+          },
+        });
+
+        if (!details) {
+          mediaInfo.media_type = type;
+          const name =
+            mediaInfo.media_type === "movie"
+              ? mediaInfo.title || mediaInfo.original_title
+              : mediaInfo.name || mediaInfo.original_name;
+
+          details = await prisma.discussion.create({
+            data: {
+              name,
+              type: type || "movie",
+              poster_path: mediaInfo.poster_path || "/default_poster.jpg",
+              imdb_id: `${mediaInfo.id}`,
+              adult: mediaInfo.adult,
+              backdrop_path: mediaInfo.backdrop_path,
+              budget:
+                (mediaInfo.media_type === "movie" && `${mediaInfo.budget}`) ||
+                null,
+              genres: mediaInfo.genres,
+              homepage: mediaInfo.homepage,
+              origin_country: mediaInfo.origin_country,
+              original_title:
+                mediaInfo.media_type === "movie"
+                  ? mediaInfo.original_title
+                  : mediaInfo.original_name,
+              original_language: mediaInfo.original_language,
+              popularity: mediaInfo.popularity,
+              overview: mediaInfo.overview,
+              production_companies: mediaInfo.production_companies,
+              release_date:
+                mediaInfo.media_type === "movie"
+                  ? mediaInfo.release_date
+                  : mediaInfo.first_air_date,
+              revenue:
+                (mediaInfo.media_type === "movie" && `${mediaInfo.revenue}`) ||
+                null,
+              runtime:
+                (mediaInfo.media_type === "movie" && `${mediaInfo.runtime}`) ||
+                null,
+              status: mediaInfo.status,
+              vote_average: `${mediaInfo.vote_average}`,
+              vote_count: `${mediaInfo.vote_count}`,
+            },
+            include: {
+              _count: { select: { threads: true } },
+            },
+          });
+        }
+
+        if (details._count.threads > 0) return;
+
+        const opinions = await generateMovieComments(
+          details.name,
+          details.overview
+        );
+
+        const newThreads = [];
+
+        for (let i = 0; i < opinions.length - 1; i += 2) {
+          const user1 = {
+            username: faker.person.fullName(),
+            email: faker.internet.email() + Date.now(),
+            image: faker.image.avatar(),
+          };
+          const user2 = {
+            username: faker.person.fullName(),
+            email: faker.internet.email() + Date.now(),
+            image: faker.image.avatar(),
+          };
+
+          const [user_id1, user_id2] = await Promise.all([
+            prisma.user.create({
+              data: { ...user1, role: "TEST" },
+              select: { id: true },
+            }),
+            prisma.user.create({
+              data: { ...user2, role: "TEST" },
+              select: { id: true },
+            }),
+          ]);
+
+          newThreads.push(
+            prisma.thread.create({
+              data: {
+                user_id: user_id1.id,
+                discussion_id: details.id,
+                content: opinions[i],
+                html: `<p>${opinions[i]}</p>`,
+                isReply: false,
+                replies: {
+                  create: {
+                    user_id: user_id2.id,
+                    discussion_id: details.id,
+                    content: opinions[i + 1],
+                    html: `<p>${opinions[i + 1]}</p>`,
+                    isReply: true,
+                  },
+                },
+              },
+            })
+          );
+        }
+
+        await Promise.all(newThreads);
+      })
+    );
+
+    res
+      .status(200)
+      .json({
+        message: "Movie and TV show threads faked successfully",
+      });
+  } catch (error) {
+    const message = handleError(error, "Error while faking threads - ");
     res.status(500).json({ message });
   }
 };

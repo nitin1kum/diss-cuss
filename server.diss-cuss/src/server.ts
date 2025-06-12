@@ -28,7 +28,7 @@ app.use("/api/collection", popularRoutes);
 app.use("/api/collection/threads", threadRoutes);
 app.use("/api/collection/details", detailsRoutes);
 app.use("/api/collection/search", searchRoutes);
-app.use("/api/collection/metadata",metadataRoutes)
+app.use("/api/collection/metadata",metadataRoutes);
 
 // sitemap routes
 app.use("/api/sitemap", sitemapRoutes);

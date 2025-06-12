@@ -1,12 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
- images: {
-    domains: ['m.media-amazon.com', 'image.tmdb.org',"lh3.googleusercontent.com",'i.pravatar.cc'], // add other domains as needed
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**", // matches any hostname
+      },
+    ],
   },
-  eslint : {
-    ignoreDuringBuilds : true
-  }
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
