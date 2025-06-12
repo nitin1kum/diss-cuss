@@ -10,7 +10,6 @@ yarn.lock
 
 # Prisma
 prisma/dev.db
-prisma/migrations/
 prisma/.env
 
 # OS
