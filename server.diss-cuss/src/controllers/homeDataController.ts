@@ -2,6 +2,7 @@ import { Response, Request } from "express";
 import { axiosTmdbInstance } from "../utils/axiosInstance";
 import { handleError } from "../utils/handleError";
 import { paginationSchema } from "../schemas/pagination.schema";
+import { logger } from "../utils/logger";
 
 interface reqQuery {
   page: string;
@@ -13,6 +14,7 @@ export const popularMovies = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Popular movies endpoint hit")
     const parsed = paginationSchema.safeParse(req.query);
 
     if (!parsed.success) {
@@ -42,6 +44,7 @@ export const popularTvShows = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Popular tv endpoint hit")
     const parsed = paginationSchema.safeParse(req.query);
 
     if (!parsed.success) {
@@ -70,6 +73,7 @@ export const upcomingMovies = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Upcoming movies endpoint hit")
     const parsed = paginationSchema.safeParse(req.query);
 
     if (!parsed.success) {

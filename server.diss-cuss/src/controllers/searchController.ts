@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { axiosTmdbInstance } from "../utils/axiosInstance";
 import { handleError } from "../utils/handleError";
 import { searchSchema } from "../schemas/search.schema";
+import { logger } from "../utils/logger";
 
 interface reqQuery {
   query: string;
@@ -15,6 +16,7 @@ export const getSearchResults = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Search endpoint hit")
     const parsed = searchSchema.safeParse(req.query);
 
     if (!parsed.success) {

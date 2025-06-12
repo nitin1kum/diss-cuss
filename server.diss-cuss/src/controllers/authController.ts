@@ -14,6 +14,7 @@ import { emailTemplate } from "../utils/emailTemplates";
 import { decryptEmail, encryptEmail } from "../utils/emailEncryption";
 import argon2 from "argon2";
 import axios from "axios";
+import { logger } from "../utils/logger";
 
 const {
   GOOGLE_CLIENT_ID,
@@ -65,6 +66,7 @@ export const registerUser = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("register endpoint hit")
     const parsed = registrationSchema.safeParse(req.body);
     if (parsed.error) {
       return res.status(400).json({ error: parsed.error.flatten() });
@@ -116,6 +118,7 @@ export const registerUser = async (
       });
     }
 
+    logger.info("Some unknown error occurred while registering");
     return res.status(400).json({
       message: "Some unknown error occurred",
     });
@@ -131,6 +134,7 @@ export const loginUser = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Login endpoint hit")
     const parsed = loginSchema.safeParse(req.body);
     if (parsed.error) {
       return res.status(400).json({ error: parsed.error.flatten() });
@@ -190,6 +194,7 @@ export const authenticateUser = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("authentication endpoint hit")
     const user = req.user;
     if (user) {
       return res.status(200).json({
@@ -209,6 +214,7 @@ export const authenticateUser = async (
 //logout
 export const logoutUser = async (req: Request, res: Response): Promise<any> => {
   try {
+    logger.info("Logout endpoint hit")
     const { refreshToken } = req.signedCookies;
     if (!refreshToken) {
       return res.status(404).json({
@@ -235,6 +241,7 @@ export const logoutUser = async (req: Request, res: Response): Promise<any> => {
 // verify email
 export async function verifyEmail(req: Request, res: Response): Promise<any> {
   try {
+    logger.info("Verify email endpoint hit")
     const { token } = req.params;
 
     if (!token) {
@@ -273,6 +280,7 @@ export async function verifyEmail(req: Request, res: Response): Promise<any> {
 // resend email
 export async function resendEmail(req: Request, res: Response): Promise<any> {
   try {
+    logger.info("Resend email endpoint hit")
     const parsed = emailSchema.safeParse(req.body);
 
     if (parsed.error) {
@@ -304,6 +312,7 @@ export async function resendEmail(req: Request, res: Response): Promise<any> {
 
 // oauth login
 export async function oauthLogin(req: Request, res: Response): Promise<any> {
+  logger.info("Oauth endpoint hit")
   const authUrl = `${GOOGLE_AUTH_URL}?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(
     process.env.REDIRECT_URI!
   )}&scope=openid%20email%20profile&access_type=offline&prompt=consent`;
@@ -313,6 +322,7 @@ export async function oauthLogin(req: Request, res: Response): Promise<any> {
 // oauth callback
 export async function oauthCallback(req: Request<any,any,any,reqQueryOauth>, res: Response): Promise<any> {
   try {
+    logger.info("Oauth callback endpoint hit")
     const { code } = req.query;
     if (!code) throw new Error("Missing code");
 

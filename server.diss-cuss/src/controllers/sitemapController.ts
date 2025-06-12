@@ -2,6 +2,7 @@ import { prisma } from "../lib/prisma";
 import { Request, Response } from "express";
 import { handleError } from "../utils/handleError";
 import { sitemapPaginationSchema } from "../schemas/pagination.schema";
+import { logger } from "../utils/logger";
 
 interface reqQuery {
   page: string;
@@ -13,6 +14,7 @@ export const getUrls = async (
   res: Response
 ): Promise<any> => {
   try {
+    logger.info("Urls sitemap endpoint hit")
     const parsed = sitemapPaginationSchema.safeParse(req.query);
 
     if (!parsed.success) {
@@ -53,6 +55,7 @@ export const getUrls = async (
 
 export const countUrls = async (req: Request, res: Response): Promise<any> => {
   try {
+    logger.info("Count sitemaps endpoint hit")
     const discussions = await prisma.discussion.count();
 
     return res.json({ discussions_count: discussions });

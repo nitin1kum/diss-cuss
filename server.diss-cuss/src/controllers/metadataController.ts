@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { metadataSchema } from "../schemas/metadata.schema";
 import { generateKeywords } from "../utils/generateKeywords";
+import { logger } from "../utils/logger";
 
 export async function getMetaData(req: Request, res: Response) : Promise<any> {
   try {
+    logger.info("metadata endpoint hit")
     const parsed = metadataSchema.safeParse(req.query);
 
     if (parsed.error) {

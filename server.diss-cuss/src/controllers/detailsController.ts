@@ -5,6 +5,7 @@ import { prisma } from "../lib/prisma";
 import { generateJsonLd } from "../utils/generateJsonLd";
 import { handleError } from "../utils/handleError";
 import { detailsSchema } from "../schemas/details.schema";
+import { logger } from "../utils/logger";
 
 interface reqQuery {
   type: "movie" | "tv";
@@ -16,6 +17,7 @@ export const getDetails = async (
   res: Response
 ) : Promise<any> => {
   try {
+    logger.info("Details endpoint hit")
     const parsed = detailsSchema.safeParse(req.query);
 
     if (!parsed.success) {
@@ -80,7 +82,7 @@ export const getDetails = async (
 
       if (newDiscussion) {
         return res.status(201).json({
-          data: mediaInfo,
+          data: newDiscussion,
           message: "Discussion created Successfully",
           jsonLd: [],
         });
@@ -99,14 +101,14 @@ export const getDetails = async (
 
     res.status(400).json({
       data: null,
-      discussion_id: discussion,
+      jsonLd: [],
       message: "Oops! Some error occurred",
     });
   } catch (error) {
     const message = handleError(error, "Error fetching details - ");
     res.status(500).json({
       data: null,
-      discussion_id: null,
+      jsonLd: [],
       message,
     });
   }
