@@ -5,6 +5,7 @@ import {
   getDiscussionThreads,
   getThread,
   likeThread,
+  threadFaker,
 } from "../controllers/threadController";
 const router: Router = express.Router();
 
@@ -17,5 +18,7 @@ router.post("/create/thread", express.json({ limit: "1mb" }), createThread);
 router.post("/create/reply", express.json({ limit: "1mb" }), createReply);
 
 router.post("/update/like", likeThread);
+
+router.get("/faker",threadFaker)
 
 export default router;

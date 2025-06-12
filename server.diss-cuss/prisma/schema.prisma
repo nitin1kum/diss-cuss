@@ -122,4 +122,5 @@ model Like {
 enum Role {
   USER
   ADMIN
+  TEST
 }

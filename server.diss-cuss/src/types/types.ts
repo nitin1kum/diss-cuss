@@ -136,7 +136,7 @@ type TmdbBase = {
 };
 
 // Movie-specific
-type TmdbMovie = TmdbBase & {
+export type TmdbMovie = TmdbBase & {
   media_type: "movie";
   belongs_to_collection: {
     id: number;
@@ -155,7 +155,7 @@ type TmdbMovie = TmdbBase & {
 };
 
 // TV-specific
-type TmdbTv = TmdbBase & {
+export type TmdbTv = TmdbBase & {
   media_type: "tv";
   created_by: any[];
   episode_run_time: number[];

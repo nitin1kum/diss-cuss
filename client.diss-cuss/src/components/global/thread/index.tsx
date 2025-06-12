@@ -257,7 +257,7 @@ const Thread = ({ level, thread, isLast, hideParent }: Props) => {
                 ? "ies"
                 : "y"}
               <div
-                className="box-border absolute right-full h-6 -translate-y-3 border-0 border-solid border-b-[2px] cursor-pointer w-[11px] sm:w-[17px] border-l-[2px] rounded-bl-[12px] group-hover:border-text z-10 border-subtext
+                className="box-border absolute right-full h-10 -translate-y-3 border-0 border-solid border-b-[2px] cursor-pointer w-[11px] sm:w-[17px] border-l-[2px] rounded-bl-[12px] group-hover:border-text z-10 border-subtext
             -top-4
             "
               />
