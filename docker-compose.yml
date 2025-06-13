@@ -12,7 +12,7 @@ services:
       - ./server.diss-cuss/.env.production
     environment:
       BACKEND_BASE_URL: "https://api.diss-cuss.xyz"
-      NEXT_BASE_URL: "https://diss-cuss.xyz"
+      NEXT_BASE_URL: "https://www.diss-cuss.xyz"
     volumes:
       - /app/node_modules
     restart: unless-stopped
