@@ -3,20 +3,23 @@ version: "3.8"
 services:
   server:
     build: ./server.diss-cuss
+    container_name: server
     ports:
-      - "5000"
+      - "5000" # exposed to internal network only
     depends_on:
       - db
     env_file:
       - ./server.diss-cuss/.env.production
     environment:
-      BACKEND_BASE_URL: "https://diss-cuss.duckdns.org"
-      NEXT_BASE_URL: "https://diss-cuss.vercel.app"
+      BACKEND_BASE_URL: "https://api.diss-cuss.xyz"
+      NEXT_BASE_URL: "https://diss-cuss.xyz"
     volumes:
       - /app/node_modules
+    restart: unless-stopped
 
   db:
     image: postgres:14
+    container_name: postgres
     restart: always
     ports:
       - "5432:5432"
@@ -27,20 +30,18 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
-  caddy:
-    image: caddy:latest
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
+      - "443:443" # Required for HTTPS
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
+      - ./nginx/api.diss-cuss.xyz.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro # mount real certs
     depends_on:
       - server
-    restart: always
 
 volumes:
   db-data:
-  caddy_data:
-  caddy_config:

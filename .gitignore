@@ -1,0 +1,9 @@
+# Node
+node_modules/
+.env
+
+# Secrets/SSL
+*.pem
+*.key
+certs/
+letsencrypt/
