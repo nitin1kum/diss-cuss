@@ -1,3 +1,4 @@
+To be modified...
 # Movie Discussion Website
 A modern, full-stack web platform for discussing movies and TV shows in real time. Users can create and join discussion threads, reply with threaded comments, like posts, and interact live with others. The platform features secure authentication, user profiles, search and filtering, and is optimized for SEO. Built with Next.js, Node.js, PostgreSQL, Prisma, NextAuth.js, and Socket.io, and integrates with the TMDB API for up-to-date movie and TV data.
 
