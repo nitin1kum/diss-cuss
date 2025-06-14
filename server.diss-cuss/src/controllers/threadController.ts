@@ -480,132 +480,123 @@ export const threadFaker = async (
       ),
     ]);
 
-    const allMedia = [...movieRes.data.results, ...tvRes.data.results]; // limit to 10 items
+    const allMedia = [...movieRes.data.results, ...tvRes.data.results];
 
-    await Promise.all(
-      allMedia.map(async (mediaInfo: TmdbMediaDetails) => {
-        const imdb_id = String(mediaInfo.id);
-        const type = mediaInfo.media_type || "movie";
+    const allMediaDetails = await Promise.all(
+      allMedia.map((media: TmdbMediaDetails) =>
+        axiosTmdbInstance(`/${media.media_type}/${media.id}`).then(
+          (res) => res.data
+        )
+      )
+    );
 
-        let details = await prisma.discussion.findUnique({
-          where: { imdb_id_type: { imdb_id, type } },
-          include: {
-            _count: { select: { threads: true } },
+    const users = await prisma.user.findMany({ where: { role: "TEST" } });
+    if (users.length < 2) {
+      throw new Error(
+        "At least two test users are required to generate threads."
+      );
+    }
+    let count = 0;
+
+    for (const data of allMediaDetails) {
+      data.media_type = data.title ? "movie" : "tv";
+      const mediaInfo = data as TmdbMediaDetails;
+
+      let discussion = await prisma.discussion.findUnique({
+        where: { imdb_id_type: { imdb_id: String(mediaInfo.id), type : mediaInfo.media_type } },
+        include: { _count: { select: { threads: true } } },
+      });
+
+      if (!discussion) {
+        const name =
+          mediaInfo.media_type === "movie"
+            ? mediaInfo.title || mediaInfo.original_title
+            : mediaInfo.name || mediaInfo.original_name;
+
+        discussion = await prisma.discussion.create({
+          data: {
+            name,
+            type: mediaInfo.media_type || "movie",
+            poster_path: mediaInfo.poster_path || "/default_poster.jpg",
+            imdb_id: `${mediaInfo.id}`,
+            adult: mediaInfo.adult,
+            backdrop_path: mediaInfo.backdrop_path,
+            budget:
+              (mediaInfo.media_type === "movie" && `${mediaInfo.budget}`) ||
+              null,
+            genres: mediaInfo.genres,
+            homepage: mediaInfo.homepage,
+            origin_country: mediaInfo.origin_country,
+            original_title:
+              mediaInfo.media_type === "movie"
+                ? mediaInfo.original_title
+                : mediaInfo.original_name,
+            original_language: mediaInfo.original_language,
+            popularity: mediaInfo.popularity,
+            overview: mediaInfo.overview,
+            production_companies: mediaInfo.production_companies,
+            release_date:
+              mediaInfo.media_type === "movie"
+                ? mediaInfo.release_date
+                : mediaInfo.first_air_date,
+            revenue:
+              (mediaInfo.media_type === "movie" && `${mediaInfo.revenue}`) ||
+              null,
+            runtime:
+              (mediaInfo.media_type === "movie" && `${mediaInfo.runtime}`) ||
+              null,
+            status: mediaInfo.status,
+            vote_average: `${mediaInfo.vote_average}`,
+            vote_count: `${mediaInfo.vote_count}`,
           },
+          include : { _count: { select: { threads: true } } },
         });
+      }
 
-        if (!details) {
-          mediaInfo.media_type = type;
-          const name =
-            mediaInfo.media_type === "movie"
-              ? mediaInfo.title || mediaInfo.original_title
-              : mediaInfo.name || mediaInfo.original_name;
+      if (discussion._count.threads > 0) continue;
 
-          details = await prisma.discussion.create({
+      const opinions = await generateMovieComments(
+        discussion.name,
+        discussion.overview
+      );
+      const newThreads = [];
+
+      let userIndex = 0;
+      for (let i = 0; i < opinions.length - 1; i += 2) {
+        const user1 = users[userIndex % users.length];
+        userIndex++;
+        const user2 = users[userIndex % users.length];
+        userIndex++;
+
+        newThreads.push(
+          prisma.thread.create({
             data: {
-              name,
-              type: type || "movie",
-              poster_path: mediaInfo.poster_path || "/default_poster.jpg",
-              imdb_id: `${mediaInfo.id}`,
-              adult: mediaInfo.adult,
-              backdrop_path: mediaInfo.backdrop_path,
-              budget:
-                (mediaInfo.media_type === "movie" && `${mediaInfo.budget}`) ||
-                null,
-              genres: mediaInfo.genres,
-              homepage: mediaInfo.homepage,
-              origin_country: mediaInfo.origin_country,
-              original_title:
-                mediaInfo.media_type === "movie"
-                  ? mediaInfo.original_title
-                  : mediaInfo.original_name,
-              original_language: mediaInfo.original_language,
-              popularity: mediaInfo.popularity,
-              overview: mediaInfo.overview,
-              production_companies: mediaInfo.production_companies,
-              release_date:
-                mediaInfo.media_type === "movie"
-                  ? mediaInfo.release_date
-                  : mediaInfo.first_air_date,
-              revenue:
-                (mediaInfo.media_type === "movie" && `${mediaInfo.revenue}`) ||
-                null,
-              runtime:
-                (mediaInfo.media_type === "movie" && `${mediaInfo.runtime}`) ||
-                null,
-              status: mediaInfo.status,
-              vote_average: `${mediaInfo.vote_average}`,
-              vote_count: `${mediaInfo.vote_count}`,
-            },
-            include: {
-              _count: { select: { threads: true } },
-            },
-          });
-        }
-
-        if (details._count.threads > 0) return;
-
-        const opinions = await generateMovieComments(
-          details.name,
-          details.overview
-        );
-
-        const newThreads = [];
-
-        for (let i = 0; i < opinions.length - 1; i += 2) {
-          const user1 = {
-            username: faker.person.fullName(),
-            email: faker.internet.email() + Date.now(),
-            image: faker.image.avatar(),
-          };
-          const user2 = {
-            username: faker.person.fullName(),
-            email: faker.internet.email() + Date.now(),
-            image: faker.image.avatar(),
-          };
-
-          const [user_id1, user_id2] = await Promise.all([
-            prisma.user.create({
-              data: { ...user1, role: "TEST" },
-              select: { id: true },
-            }),
-            prisma.user.create({
-              data: { ...user2, role: "TEST" },
-              select: { id: true },
-            }),
-          ]);
-
-          newThreads.push(
-            prisma.thread.create({
-              data: {
-                user_id: user_id1.id,
-                discussion_id: details.id,
-                content: opinions[i],
-                html: `<p>${opinions[i]}</p>`,
-                isReply: false,
-                replies: {
-                  create: {
-                    user_id: user_id2.id,
-                    discussion_id: details.id,
-                    content: opinions[i + 1],
-                    html: `<p>${opinions[i + 1]}</p>`,
-                    isReply: true,
-                  },
+              user_id: user1.id,
+              discussion_id: discussion.id,
+              content: opinions[i],
+              html: `<p>${opinions[i]}</p>`,
+              isReply: false,
+              replies: {
+                create: {
+                  user_id: user2.id,
+                  discussion_id: discussion.id,
+                  content: opinions[i + 1],
+                  html: `<p>${opinions[i + 1]}</p>`,
+                  isReply: true,
                 },
               },
-            })
-          );
-        }
+            },
+          })
+        );
+      }
 
-        await Promise.all(newThreads);
-      })
-    );
+      await Promise.all(newThreads);
+      count++;
+    }
 
     res
       .status(200)
-      .json({
-        message: "Movie and TV show threads faked successfully",
-      });
+      .json({ message: "Movie and TV show threads faked successfully",count });
   } catch (error) {
     const message = handleError(error, "Error while faking threads - ");
     res.status(500).json({ message });

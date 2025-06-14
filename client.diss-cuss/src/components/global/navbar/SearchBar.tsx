@@ -110,6 +110,7 @@ const SearchBar = () => {
         <Search />
       </button>
       <div
+      ref={containerRef}
         className={`${
           showNav ? "flex" : "hidden"
         } sm:w-[300px] w-full absolute sm:bg-transparent bg-bg z-50 inset-0 top-0 sm:relative sm:flex items-center`}
@@ -129,7 +130,6 @@ const SearchBar = () => {
             className="relative w-full flex justify-between"
           >
             <input
-              ref={containerRef}
               type="search"
               id="search"
               className="w-full border-none p-2 outline-none text-text bg-transparent"
@@ -146,18 +146,18 @@ const SearchBar = () => {
           </form>
         </div>
         {showType && (
-          <div className="absolute top-full mt-3 bg-card w-36 text-subtext border border-border shadow-ll">
+          <div className="absolute top-full mt-3 bg-card w-36 text-subtext border border-border shadow-xl">
             <button
               onClick={() => setType("movie")}
               className={`border-b w-full border-border-secondary p-2 ${
-                type === "movie" && "bg-gray-600/20"
+                type === "movie" && "bg-gray-300/50 dark:bg-zinc-800/50 text-text"
               }`}
             >
               Movies
             </button>
             <button
               onClick={() => setType("tv")}
-              className={`p-2 w-full ${type === "tv" && "bg-gray-600/20"}`}
+              className={`p-2 w-full ${type === "tv" && "bg-gray-300/50 dark:bg-zinc-800/50 text-text"}`}
             >
               TV/Web series
             </button>
