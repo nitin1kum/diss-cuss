@@ -496,6 +496,7 @@ export const threadFaker = async (
         "At least two test users are required to generate threads."
       );
     }
+    let count = 0;
 
     for (const data of allMediaDetails) {
       data.media_type = data.title ? "movie" : "tv";
@@ -590,11 +591,12 @@ export const threadFaker = async (
       }
 
       await Promise.all(newThreads);
+      count++;
     }
 
     res
       .status(200)
-      .json({ message: "Movie and TV show threads faked successfully" });
+      .json({ message: "Movie and TV show threads faked successfully",count });
   } catch (error) {
     const message = handleError(error, "Error while faking threads - ");
     res.status(500).json({ message });
