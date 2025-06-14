@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import AuthProvider from "@/contexts/AuthProvider";
 import RouteLoader from "@/components/global/route-loader";
 import LoaderProvider from "@/contexts/LoaderStateProvider";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     title: "Diss-Cuss | Talk About Movies",
     description:
       "Create threads, discuss movies, and join a community of film lovers.",
-    url: "${process.env.NEXTBASE_URL}",
+    url: `${process.env.NEXTBASE_URL}`,
     siteName: "Diss-Cuss",
     images: [
       {
@@ -85,6 +86,7 @@ export default function RootLayout({
           </AuthProvider>
           <ToastContainer position="bottom-center" hideProgressBar limit={1} />
         </LoaderProvider>
+        <SpeedInsights/>
       </body>
     </html>
   );

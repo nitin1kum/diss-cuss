@@ -21,6 +21,10 @@ export default {
         highlight: 'var(--highlight)',
         link: 'var(--link)',
       },
+      screens : {
+        "xs" : '500px',
+        'xxs' : '400px'
+      }
     },
   },
   plugins: [require('@tailwindcss/typography')],
